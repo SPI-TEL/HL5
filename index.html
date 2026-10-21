@@ -1,179 +1,204 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Gerencial - Controle de Demanda HL5</title>
+    <title>Controle de Demanda HL5 - Portal Gerencial</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0b0f19',
+                        cardbg: '#111827',
+                        borderbg: '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PapaParse para conversão do CSV -->
+    <!-- PapaParse para CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-[#0b0f19] text-slate-100 min-h-screen p-4 space-y-4">
 
-    <!-- Top Navigation -->
-    <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
-                <i data-lucide="activity" class="h-7 w-7 text-indigo-400"></i>
-                <div>
-                    <h1 class="text-xl font-bold tracking-tight">Portal Gerencial HL5</h1>
-                    <p class="text-xs text-indigo-200">Acompanhamento e Métricas de Ativação 5G</p>
+    <!-- CABEÇALHO NO MODELO PADRÃO DA IMAGEM -->
+    <header class="bg-[#0f172a] border border-slate-800 rounded-2xl p-4 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+        <!-- Lado Esquerdo: Ícone + Títulos + Badge -->
+        <div class="flex items-center space-x-4">
+            <div class="bg-sky-500 text-white p-3.5 rounded-2xl flex items-center justify-center shadow-lg shadow-sky-500/20">
+                <i class="fa-solid fa-clock-rotate-left text-2xl"></i>
+            </div>
+            <div>
+                <div class="flex items-center space-x-3 flex-wrap">
+                    <h1 class="text-lg md:text-xl font-bold tracking-tight text-white">CONTROLE DE DEMANDA DE HL5 (5G)</h1>
+                    <span class="text-xs font-semibold text-sky-400 bg-sky-950/80 border border-sky-800/80 px-2.5 py-0.5 rounded-md">
+                        Google Sheets Live • Aba Analítico
+                    </span>
                 </div>
+                <p class="text-xs text-slate-400 mt-0.5">
+                    Contrato Vivo • Acompanhamento Gerencial de Ativação • Planta Interna & Rede de Acesso
+                </p>
             </div>
-            <div class="flex items-center space-x-3">
-                <button onclick="carregarDados()" class="flex items-center space-x-1 bg-indigo-700 hover:bg-indigo-600 text-xs px-3 py-2 rounded-lg transition font-medium">
-                    <i data-lucide="refresh-cw" class="h-4 w-4"></i>
-                    <span>Atualizar Dados</span>
-                </button>
+        </div>
+
+        <!-- Lado Direito: Sincronização + Botões de Ação -->
+        <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+            <div class="text-right hidden lg:block mr-2">
+                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Última Sincronização</p>
+                <p id="hora-sincronizacao" class="text-sm font-bold text-white font-mono">--:--:--</p>
             </div>
+
+            <button onclick="carregarDados()" class="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition shadow-lg shadow-emerald-900/30">
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <span>Sincronizar</span>
+            </button>
+
+            <button onclick="window.print()" class="flex items-center space-x-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs px-4 py-2.5 rounded-xl transition">
+                <i class="fa-solid fa-print"></i>
+                <span>Relatório / PDF</span>
+            </button>
+
+            <button onclick="exportarCSV()" class="flex items-center space-x-2 bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition shadow-lg shadow-sky-900/30">
+                <i class="fa-solid fa-file-excel"></i>
+                <span>Exportar Base</span>
+            </button>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <!-- 1. VISÃO GERAL / CARDS DE KPIS -->
+    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div class="bg-[#111827] p-4 rounded-xl border border-slate-800 shadow-sm border-l-4 border-l-sky-500">
+            <p class="text-xs text-slate-400 font-medium">Demandas Recebidas</p>
+            <p id="kpi-recebidas" class="text-2xl font-bold text-white mt-1">0</p>
+        </div>
+        <div class="bg-[#111827] p-4 rounded-xl border border-slate-800 shadow-sm border-l-4 border-l-emerald-500">
+            <p class="text-xs text-slate-400 font-medium">Ativações Executadas</p>
+            <p id="kpi-executadas" class="text-2xl font-bold text-emerald-400 mt-1">0</p>
+        </div>
+        <div class="bg-[#111827] p-4 rounded-xl border border-slate-800 shadow-sm border-l-4 border-l-amber-500">
+            <p class="text-xs text-slate-400 font-medium">Pendentes em Aberto</p>
+            <p id="kpi-pendentes" class="text-2xl font-bold text-amber-400 mt-1">0</p>
+        </div>
+        <div class="bg-[#111827] p-4 rounded-xl border border-slate-800 shadow-sm border-l-4 border-l-rose-500">
+            <p class="text-xs text-slate-400 font-medium">Impedimento Vivo</p>
+            <p id="kpi-vivo" class="text-2xl font-bold text-rose-400 mt-1">0</p>
+        </div>
+        <div class="bg-[#111827] p-4 rounded-xl border border-slate-800 shadow-sm border-l-4 border-l-purple-500">
+            <p class="text-xs text-slate-400 font-medium">Impedimento TEL</p>
+            <p id="kpi-tel" class="text-2xl font-bold text-purple-400 mt-1">0</p>
+        </div>
+        <div class="bg-[#111827] p-4 rounded-xl border border-slate-800 shadow-sm border-l-4 border-l-cyan-500">
+            <p class="text-xs text-slate-400 font-medium">Total Ponto Baremo</p>
+            <p id="kpi-baremo" class="text-base font-bold text-white mt-1">R$ 0,00</p>
+        </div>
+    </section>
 
-        <!-- 1. Visão Geral do Período (KPI Cards) -->
-        <section>
-            <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">1. Visão Geral do Período</h2>
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
-                    <p class="text-xs text-slate-500 font-medium">Demandas Recebidas</p>
-                    <p id="kpi-recebidas" class="text-2xl font-bold text-slate-800 mt-1">0</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
-                    <p class="text-xs text-slate-500 font-medium">Ativações Executadas</p>
-                    <p id="kpi-executadas" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
-                    <p class="text-xs text-slate-500 font-medium">Pendentes / Programadas</p>
-                    <p id="kpi-pendentes" class="text-2xl font-bold text-amber-600 mt-1">0</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-rose-500">
-                    <p class="text-xs text-slate-500 font-medium">Impedimento Vivo</p>
-                    <p id="kpi-vivo" class="text-2xl font-bold text-rose-600 mt-1">0</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-purple-500">
-                    <p class="text-xs text-slate-500 font-medium">Impedimento TEL</p>
-                    <p id="kpi-tel" class="text-2xl font-bold text-purple-600 mt-1">0</p>
-                </div>
-                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-cyan-500">
-                    <p class="text-xs text-slate-500 font-medium">Valor Total Ponto Baremo</p>
-                    <p id="kpi-baremo" class="text-lg font-bold text-slate-800 mt-1">R$ 0,00</p>
-                </div>
+    <!-- PAINEL DE FILTROS -->
+    <section class="bg-[#111827] p-4 rounded-xl border border-slate-800">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Área</label>
+                <select id="filtro-area" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-900 text-slate-200 border border-slate-700 rounded-lg p-2 focus:border-sky-500">
+                    <option value="">Todas as Áreas</option>
+                </select>
             </div>
-        </section>
-
-        <!-- Filtros Dinâmicos -->
-        <section class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Área</label>
-                    <select id="filtro-area" onchange="aplicarFiltros()" class="w-full text-xs p-2 border border-slate-300 rounded-lg">
-                        <option value="">Todas as Áreas</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Coordenador TEL</label>
-                    <select id="filtro-coordenador" onchange="aplicarFiltros()" class="w-full text-xs p-2 border border-slate-300 rounded-lg">
-                        <option value="">Todos os Coordenadores</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Situação Atividade</label>
-                    <select id="filtro-situacao" onchange="aplicarFiltros()" class="w-full text-xs p-2 border border-slate-300 rounded-lg">
-                        <option value="">Todas as Situações</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Responsável Pendência</label>
-                    <select id="filtro-responsavel" onchange="aplicarFiltros()" class="w-full text-xs p-2 border border-slate-300 rounded-lg">
-                        <option value="">Todos os Responsáveis</option>
-                    </select>
-                </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Coordenador TEL</label>
+                <select id="filtro-coordenador" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-900 text-slate-200 border border-slate-700 rounded-lg p-2 focus:border-sky-500">
+                    <option value="">Todos os Coordenadores</option>
+                </select>
             </div>
-        </section>
-
-        <!-- Charts Section (Gráficos) -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- 2. Demanda x Execução por Dia -->
-            <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <h3 class="text-sm font-semibold text-slate-700 mb-4 flex items-center justify-between">
-                    <span>2. Demanda x Execução por Criação</span>
-                </h3>
-                <div class="h-64">
-                    <canvas id="chartEvolucao"></canvas>
-                </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Situação Atividade</label>
+                <select id="filtro-situacao" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-900 text-slate-200 border border-slate-700 rounded-lg p-2 focus:border-sky-500">
+                    <option value="">Todas as Situações</option>
+                </select>
             </div>
-
-            <!-- 4. Motivos das Pendências -->
-            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-                <h3 class="text-sm font-semibold text-slate-700 mb-4">4. Resumo de Pendências por Motivo</h3>
-                <div class="h-64 flex items-center justify-center">
-                    <canvas id="chartMotivos"></canvas>
-                </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">Responsável Pendência</label>
+                <select id="filtro-responsavel" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-900 text-slate-200 border border-slate-700 rounded-lg p-2 focus:border-sky-500">
+                    <option value="">Todos os Responsáveis</option>
+                </select>
             </div>
         </div>
+    </section>
 
-        <!-- 3. Consolidação por Área -->
-        <section class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-            <h3 class="text-sm font-semibold text-slate-700 mb-4">3. Visão Consolidada por Área Operacional</h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left border-collapse">
-                    <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
-                        <tr>
-                            <th class="p-3">Área</th>
-                            <th class="p-3">Recebidas</th>
-                            <th class="p-3">Executadas</th>
-                            <th class="p-3">Pendentes</th>
-                            <th class="p-3">Pendente Agendamento</th>
-                            <th class="p-3">Impedimento Rede/Caixa</th>
-                            <th class="p-3">Falha Script/Ilha</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-area" class="divide-y divide-slate-200">
-                        <!-- Preenchido dinamicamente -->
-                    </tbody>
-                </table>
+    <!-- GRÁFICOS GERENCIAIS -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Demanda x Execução -->
+        <div class="lg:col-span-2 bg-[#111827] p-4 rounded-xl border border-slate-800">
+            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Demanda x Execução por Data de Criação</h3>
+            <div class="h-60">
+                <canvas id="chartEvolucao"></canvas>
             </div>
-        </section>
+        </div>
+        <!-- Motivos das Pendências -->
+        <div class="bg-[#111827] p-4 rounded-xl border border-slate-800">
+            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Distribuição das Pendências</h3>
+            <div class="h-60 flex items-center justify-center">
+                <canvas id="chartMotivos"></canvas>
+            </div>
+        </div>
+    </div>
 
-        <!-- 5. Detalhamento das Demandas -->
-        <section class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-            <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
-                <h3 class="text-sm font-semibold text-slate-700">5. Detalhamento Operacional das Demandas</h3>
-                <input type="text" id="busca-tabela" onkeyup="filtrarTabela()" placeholder="Buscar por Site, OS, Cidade ou Pendência..." class="text-xs p-2 border border-slate-300 rounded-lg w-full md:w-72">
-            </div>
-            <div class="overflow-x-auto max-h-96">
-                <table class="w-full text-xs text-left border-collapse sticky top-0">
-                    <thead class="bg-indigo-900 text-white font-semibold">
-                        <tr>
-                            <th class="p-3">Site</th>
-                            <th class="p-3">OS PRISMA</th>
-                            <th class="p-3">Cidade</th>
-                            <th class="p-3">Área</th>
-                            <th class="p-3">Coordenador</th>
-                            <th class="p-3">Criação</th>
-                            <th class="p-3">Situação</th>
-                            <th class="p-3">Responsável</th>
-                            <th class="p-3">Pendência / Detalhes</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-detalhes" class="divide-y divide-slate-200">
-                        <!-- Preenchido via script -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+    <!-- TABELA CONSOLIDADA POR ÁREA -->
+    <section class="bg-[#111827] p-4 rounded-xl border border-slate-800">
+        <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider mb-3">Consolidado por Área Operacional</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left text-slate-300">
+                <thead class="bg-slate-900 text-slate-400 uppercase font-semibold border-b border-slate-800">
+                    <tr>
+                        <th class="p-2.5">Área</th>
+                        <th class="p-2.5">Recebidas</th>
+                        <th class="p-2.5">Executadas</th>
+                        <th class="p-2.5">Pendentes</th>
+                        <th class="p-2.5">Agendamento Vivo</th>
+                        <th class="p-2.5">Rede / Externa</th>
+                        <th class="p-2.5">Script / Ilha</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-area" class="divide-y divide-slate-800/60"></tbody>
+            </table>
+        </div>
+    </section>
 
-    </main>
+    <!-- TABELA DETALHADA -->
+    <section class="bg-[#111827] p-4 rounded-xl border border-slate-800">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
+            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wider">Detalhamento Operacional das Demandas</h3>
+            <input type="text" id="busca-tabela" onkeyup="filtrarTabela()" placeholder="Buscar por Site, OS, Cidade..." class="text-xs bg-slate-900 text-slate-200 border border-slate-700 rounded-lg p-2 w-full md:w-64 focus:border-sky-500">
+        </div>
+        <div class="overflow-x-auto max-h-96">
+            <table class="w-full text-xs text-left text-slate-300">
+                <thead class="bg-slate-900 text-slate-300 font-semibold border-b border-slate-800 sticky top-0">
+                    <tr>
+                        <th class="p-2.5">Site</th>
+                        <th class="p-2.5">OS PRISMA</th>
+                        <th class="p-2.5">Cidade</th>
+                        <th class="p-2.5">Área</th>
+                        <th class="p-2.5">Coordenador</th>
+                        <th class="p-2.5">Criação</th>
+                        <th class="p-2.5">Situação</th>
+                        <th class="p-2.5">Responsável</th>
+                        <th class="p-2.5">Detalhes / Pendência</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-detalhes" class="divide-y divide-slate-800/60"></tbody>
+            </table>
+        </div>
+    </section>
 
     <script>
         const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFRoHdZnSbKTAl55EPRAiGDvWWbi5lKc13hhhZGs5suxG1FgNzJsxua24i327jug/pub?gid=1793331674&single=true&output=csv';
@@ -181,10 +206,7 @@
         let chartEvolucaoObj = null;
         let chartMotivosObj = null;
 
-        document.addEventListener("DOMContentLoaded", () => {
-            lucide.createIcons();
-            carregarDados();
-        });
+        document.addEventListener("DOMContentLoaded", carregarDados);
 
         function carregarDados() {
             Papa.parse(CSV_URL, {
@@ -201,15 +223,21 @@
                         dataCriacao: item['Data Criação'] || '',
                         situacao: item['Situação Atividade'] || '',
                         responsavel: item['Responsavel '] || item['Responsavel'] || '',
-                        prioridadeVivo: item['Prioridade Vivo'] || '',
                         detalhes: item['Detalhes_Informações'] || '',
                         resumoPendencias: item['Resumo Pendencias\u00a0'] || item['Resumo Pendencias'] || '',
                         pontoBaremo: item[' Ponto Baremo '] || item['Ponto Baremo'] || '0'
                     }));
+
+                    atualizarHorario();
                     popularFiltros(dadosGlobais);
                     aplicarFiltros();
                 }
             });
+        }
+
+        function atualizarHorario() {
+            const agora = new Date();
+            document.getElementById('hora-sincronizacao').innerText = agora.toLocaleTimeString('pt-BR');
         }
 
         function popularFiltros(dados) {
@@ -288,23 +316,28 @@
                 data: {
                     labels: datas,
                     datasets: [
-                        { label: 'Demandas Recebidas', data: recebidas, backgroundColor: '#3b82f6' },
+                        { label: 'Demandas Recebidas', data: recebidas, backgroundColor: '#0284c7' },
                         { label: 'Executadas', data: executadas, backgroundColor: '#10b981' }
                     ]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' } }
+                    }
+                }
             });
         }
 
         function atualizarGraficoMotivos(dados) {
             const motivos = {};
             dados.forEach(d => {
-                const m = d.resumoPendencias || 'Sem Resumo';
+                const m = d.resumoPendencias || 'Sem Pendência';
                 motivos[m] = (motivos[m] || 0) + 1;
             });
-
-            const labels = Object.keys(motivos);
-            const values = Object.values(motivos);
 
             const ctx = document.getElementById('chartMotivos').getContext('2d');
             if (chartMotivosObj) chartMotivosObj.destroy();
@@ -312,13 +345,17 @@
             chartMotivosObj = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
-                    labels: labels,
+                    labels: Object.keys(motivos),
                     datasets: [{
-                        data: values,
-                        backgroundColor: ['#6366f1', '#f59e0b', '#ef4444', '#14b8a6', '#8b5cf6', '#ec4899']
+                        data: Object.values(motivos),
+                        backgroundColor: ['#0284c7', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899']
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#94a3b8' } } }
+                }
             });
         }
 
@@ -341,14 +378,14 @@
             Object.keys(porArea).forEach(area => {
                 const item = porArea[area];
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-semibold text-slate-700">${area}</td>
-                        <td class="p-3">${item.recebidas}</td>
-                        <td class="p-3 text-emerald-600 font-semibold">${item.executadas}</td>
-                        <td class="p-3 text-amber-600 font-semibold">${item.pendentes}</td>
-                        <td class="p-3">${item.agendamento}</td>
-                        <td class="p-3">${item.rede}</td>
-                        <td class="p-3">${item.script}</td>
+                    <tr class="hover:bg-slate-800/40">
+                        <td class="p-2.5 font-semibold text-slate-200">${area}</td>
+                        <td class="p-2.5">${item.recebidas}</td>
+                        <td class="p-2.5 text-emerald-400 font-semibold">${item.executadas}</td>
+                        <td class="p-2.5 text-amber-400 font-semibold">${item.pendentes}</td>
+                        <td class="p-2.5">${item.agendamento}</td>
+                        <td class="p-2.5">${item.rede}</td>
+                        <td class="p-2.5">${item.script}</td>
                     </tr>
                 `;
             });
@@ -358,18 +395,18 @@
             const tbody = document.getElementById('tbody-detalhes');
             tbody.innerHTML = '';
             dados.forEach(d => {
-                const badgeClass = d.situacao === 'Executada em Campo' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+                const badgeClass = d.situacao === 'Executada em Campo' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800';
                 tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50">
-                        <td class="p-3 font-bold text-indigo-900">${d.site}</td>
-                        <td class="p-3">${d.os}</td>
-                        <td class="p-3">${d.cidade}</td>
-                        <td class="p-3">${d.area}</td>
-                        <td class="p-3">${d.coordenador}</td>
-                        <td class="p-3">${d.dataCriacao}</td>
-                        <td class="p-3"><span class="px-2 py-1 text-xs rounded-full ${badgeClass}">${d.situacao}</span></td>
-                        <td class="p-3 font-semibold">${d.responsavel}</td>
-                        <td class="p-3 text-slate-500">${d.detalhes}</td>
+                    <tr class="hover:bg-slate-800/40">
+                        <td class="p-2.5 font-bold text-sky-400">${d.site}</td>
+                        <td class="p-2.5">${d.os}</td>
+                        <td class="p-2.5">${d.cidade}</td>
+                        <td class="p-2.5">${d.area}</td>
+                        <td class="p-2.5">${d.coordenador}</td>
+                        <td class="p-2.5">${d.dataCriacao}</td>
+                        <td class="p-2.5"><span class="px-2 py-0.5 text-[10px] rounded-md font-semibold ${badgeClass}">${d.situacao}</span></td>
+                        <td class="p-2.5 font-semibold text-slate-200">${d.responsavel}</td>
+                        <td class="p-2.5 text-slate-400">${d.detalhes}</td>
                     </tr>
                 `;
             });
@@ -379,9 +416,20 @@
             const termo = document.getElementById('busca-tabela').value.toLowerCase();
             const linhas = document.querySelectorAll('#tbody-detalhes tr');
             linhas.forEach(linha => {
-                const texto = linha.innerText.toLowerCase();
-                linha.style.display = texto.includes(termo) ? '' : 'none';
+                linha.style.display = linha.innerText.toLowerCase().includes(termo) ? '' : 'none';
             });
+        }
+
+        function exportarCSV() {
+            let csv = 'Site,OS,Cidade,Area,Coordenador,DataCriacao,Situacao,Responsavel,Detalhes\n';
+            dadosGlobais.forEach(d => {
+                csv += `"${d.site}","${d.os}","${d.cidade}","${d.area}","${d.coordenador}","${d.dataCriacao}","${d.situacao}","${d.responsavel}","${d.detalhes}"\n`;
+            });
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Controle_HL5_Export.csv';
+            link.click();
         }
     </script>
 </body>
