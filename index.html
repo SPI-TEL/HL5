@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Gerencial - Controle de Demanda HL5</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- PapaParse para conversão do CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Top Navigation -->
+    <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i data-lucide="activity" class="h-7 w-7 text-indigo-400"></i>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">Portal Gerencial HL5</h1>
+                    <p class="text-xs text-indigo-200">Acompanhamento e Métricas de Ativação 5G</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="carregarDados()" class="flex items-center space-x-1 bg-indigo-700 hover:bg-indigo-600 text-xs px-3 py-2 rounded-lg transition font-medium">
+                    <i data-lucide="refresh-cw" class="h-4 w-4"></i>
+                    <span>Atualizar Dados</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- 1. Visão Geral do Período (KPI Cards) -->
+        <section>
+            <h2 class="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">1. Visão Geral do Período</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-blue-500">
+                    <p class="text-xs text-slate-500 font-medium">Demandas Recebidas</p>
+                    <p id="kpi-recebidas" class="text-2xl font-bold text-slate-800 mt-1">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-emerald-500">
+                    <p class="text-xs text-slate-500 font-medium">Ativações Executadas</p>
+                    <p id="kpi-executadas" class="text-2xl font-bold text-emerald-600 mt-1">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-amber-500">
+                    <p class="text-xs text-slate-500 font-medium">Pendentes / Programadas</p>
+                    <p id="kpi-pendentes" class="text-2xl font-bold text-amber-600 mt-1">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-rose-500">
+                    <p class="text-xs text-slate-500 font-medium">Impedimento Vivo</p>
+                    <p id="kpi-vivo" class="text-2xl font-bold text-rose-600 mt-1">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-purple-500">
+                    <p class="text-xs text-slate-500 font-medium">Impedimento TEL</p>
+                    <p id="kpi-tel" class="text-2xl font-bold text-purple-600 mt-1">0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm border-l-4 border-l-cyan-500">
+                    <p class="text-xs text-slate-500 font-medium">Valor Total Ponto Baremo</p>
+                    <p id="kpi-baremo" class="text-lg font-bold text-slate-800 mt-1">R$ 0,00</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filtros Dinâmicos -->
+        <section class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Área</label>
+                    <select id="filtro-area" onchange="aplicarFiltros()" class="w-full text-xs p-2 border border-slate-300 rounded-lg">
+                        <option value="">Todas as Áreas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Coordenador TEL</label>
+                    <select id="filtro-coordenador" onchange="aplicarFiltros()" class="w-full text-xs p-2 border border-slate-300 rounded-lg">
+                        <option value="">Todos os Coordenadores</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Situação Atividade</label>
+                    <select id="filtro-situacao" onchange="aplicarFiltros()" class="w-full text-xs p-2 border border-slate-300 rounded-lg">
+                        <option value="">Todas as Situações</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">Responsável Pendência</label>
+                    <select id="filtro-responsavel" onchange="aplicarFiltros()" class="w-full text-xs p-2 border border-slate-300 rounded-lg">
+                        <option value="">Todos os Responsáveis</option>
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section (Gráficos) -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- 2. Demanda x Execução por Dia -->
+            <div class="lg:col-span-2 bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="text-sm font-semibold text-slate-700 mb-4 flex items-center justify-between">
+                    <span>2. Demanda x Execução por Criação</span>
+                </h3>
+                <div class="h-64">
+                    <canvas id="chartEvolucao"></canvas>
+                </div>
+            </div>
+
+            <!-- 4. Motivos das Pendências -->
+            <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+                <h3 class="text-sm font-semibold text-slate-700 mb-4">4. Resumo de Pendências por Motivo</h3>
+                <div class="h-64 flex items-center justify-center">
+                    <canvas id="chartMotivos"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Consolidação por Área -->
+        <section class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <h3 class="text-sm font-semibold text-slate-700 mb-4">3. Visão Consolidada por Área Operacional</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+                        <tr>
+                            <th class="p-3">Área</th>
+                            <th class="p-3">Recebidas</th>
+                            <th class="p-3">Executadas</th>
+                            <th class="p-3">Pendentes</th>
+                            <th class="p-3">Pendente Agendamento</th>
+                            <th class="p-3">Impedimento Rede/Caixa</th>
+                            <th class="p-3">Falha Script/Ilha</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-area" class="divide-y divide-slate-200">
+                        <!-- Preenchido dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 5. Detalhamento das Demandas -->
+        <section class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-2">
+                <h3 class="text-sm font-semibold text-slate-700">5. Detalhamento Operacional das Demandas</h3>
+                <input type="text" id="busca-tabela" onkeyup="filtrarTabela()" placeholder="Buscar por Site, OS, Cidade ou Pendência..." class="text-xs p-2 border border-slate-300 rounded-lg w-full md:w-72">
+            </div>
+            <div class="overflow-x-auto max-h-96">
+                <table class="w-full text-xs text-left border-collapse sticky top-0">
+                    <thead class="bg-indigo-900 text-white font-semibold">
+                        <tr>
+                            <th class="p-3">Site</th>
+                            <th class="p-3">OS PRISMA</th>
+                            <th class="p-3">Cidade</th>
+                            <th class="p-3">Área</th>
+                            <th class="p-3">Coordenador</th>
+                            <th class="p-3">Criação</th>
+                            <th class="p-3">Situação</th>
+                            <th class="p-3">Responsável</th>
+                            <th class="p-3">Pendência / Detalhes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-detalhes" class="divide-y divide-slate-200">
+                        <!-- Preenchido via script -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRFRoHdZnSbKTAl55EPRAiGDvWWbi5lKc13hhhZGs5suxG1FgNzJsxua24i327jug/pub?gid=1793331674&single=true&output=csv';
+        let dadosGlobais = [];
+        let chartEvolucaoObj = null;
+        let chartMotivosObj = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            carregarDados();
+        });
+
+        function carregarDados() {
+            Papa.parse(CSV_URL, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    dadosGlobais = results.data.map(item => ({
+                        site: item['Site'] || '',
+                        os: item['OS PRISMA'] || '',
+                        cidade: item['Cidade'] || '',
+                        area: item['Area'] || 'Outros',
+                        coordenador: item['Coordenador TEL'] || 'N/I',
+                        dataCriacao: item['Data Criação'] || '',
+                        situacao: item['Situação Atividade'] || '',
+                        responsavel: item['Responsavel '] || item['Responsavel'] || '',
+                        prioridadeVivo: item['Prioridade Vivo'] || '',
+                        detalhes: item['Detalhes_Informações'] || '',
+                        resumoPendencias: item['Resumo Pendencias\u00a0'] || item['Resumo Pendencias'] || '',
+                        pontoBaremo: item[' Ponto Baremo '] || item['Ponto Baremo'] || '0'
+                    }));
+                    popularFiltros(dadosGlobais);
+                    aplicarFiltros();
+                }
+            });
+        }
+
+        function popularFiltros(dados) {
+            const areas = [...new Set(dados.map(d => d.area))].sort();
+            const coords = [...new Set(dados.map(d => d.coordenador))].sort();
+            const situacoes = [...new Set(dados.map(d => d.situacao))].sort();
+            const responsaveis = [...new Set(dados.map(d => d.responsavel))].sort();
+
+            preencherSelect('filtro-area', areas);
+            preencherSelect('filtro-coordenador', coords);
+            preencherSelect('filtro-situacao', situacoes);
+            preencherSelect('filtro-responsavel', responsaveis);
+        }
+
+        function preencherSelect(id, lista) {
+            const select = document.getElementById(id);
+            const valAtual = select.value;
+            select.innerHTML = select.options[0].outerHTML;
+            lista.forEach(item => {
+                if(item) select.innerHTML += `<option value="${item}">${item}</option>`;
+            });
+            select.value = valAtual;
+        }
+
+        function aplicarFiltros() {
+            const area = document.getElementById('filtro-area').value;
+            const coord = document.getElementById('filtro-coordenador').value;
+            const situacao = document.getElementById('filtro-situacao').value;
+            const resp = document.getElementById('filtro-responsavel').value;
+
+            const filtrados = dadosGlobais.filter(d => {
+                return (!area || d.area === area) &&
+                       (!coord || d.coordenador === coord) &&
+                       (!situacao || d.situacao === situacao) &&
+                       (!resp || d.responsavel === resp);
+            });
+
+            atualizarKPIs(filtrados);
+            atualizarGraficoEvolucao(filtrados);
+            atualizarGraficoMotivos(filtrados);
+            atualizarTabelaArea(filtrados);
+            atualizarTabelaDetalhes(filtrados);
+        }
+
+        function atualizarKPIs(dados) {
+            const total = dados.length;
+            const executadas = dados.filter(d => d.situacao === 'Executada em Campo').length;
+            const pendentes = dados.filter(d => d.situacao === 'Pendente Execução').length;
+            const vivo = dados.filter(d => d.responsavel === 'VIVO').length;
+            const tel = dados.filter(d => d.responsavel === 'TEL').length;
+
+            let somaBaremo = 0;
+            dados.forEach(d => {
+                let val = d.pontoBaremo.replace('R$', '').replace('.', '').replace(',', '.').trim();
+                somaBaremo += parseFloat(val) || 0;
+            });
+
+            document.getElementById('kpi-recebidas').innerText = total;
+            document.getElementById('kpi-executadas').innerText = executadas;
+            document.getElementById('kpi-pendentes').innerText = pendentes;
+            document.getElementById('kpi-vivo').innerText = vivo;
+            document.getElementById('kpi-tel').innerText = tel;
+            document.getElementById('kpi-baremo').innerText = somaBaremo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function atualizarGraficoEvolucao(dados) {
+            const datas = [...new Set(dados.map(d => d.dataCriacao))].sort();
+            const recebidas = datas.map(dt => dados.filter(d => d.dataCriacao === dt).length);
+            const executadas = datas.map(dt => dados.filter(d => d.dataCriacao === dt && d.situacao === 'Executada em Campo').length);
+
+            const ctx = document.getElementById('chartEvolucao').getContext('2d');
+            if (chartEvolucaoObj) chartEvolucaoObj.destroy();
+
+            chartEvolucaoObj = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: datas,
+                    datasets: [
+                        { label: 'Demandas Recebidas', data: recebidas, backgroundColor: '#3b82f6' },
+                        { label: 'Executadas', data: executadas, backgroundColor: '#10b981' }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function atualizarGraficoMotivos(dados) {
+            const motivos = {};
+            dados.forEach(d => {
+                const m = d.resumoPendencias || 'Sem Resumo';
+                motivos[m] = (motivos[m] || 0) + 1;
+            });
+
+            const labels = Object.keys(motivos);
+            const values = Object.values(motivos);
+
+            const ctx = document.getElementById('chartMotivos').getContext('2d');
+            if (chartMotivosObj) chartMotivosObj.destroy();
+
+            chartMotivosObj = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#6366f1', '#f59e0b', '#ef4444', '#14b8a6', '#8b5cf6', '#ec4899']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+        }
+
+        function atualizarTabelaArea(dados) {
+            const porArea = {};
+            dados.forEach(d => {
+                if (!porArea[d.area]) {
+                    porArea[d.area] = { recebidas: 0, executadas: 0, pendentes: 0, agendamento: 0, rede: 0, script: 0 };
+                }
+                porArea[d.area].recebidas++;
+                if (d.situacao === 'Executada em Campo') porArea[d.area].executadas++;
+                if (d.situacao === 'Pendente Execução') porArea[d.area].pendentes++;
+                if (d.resumoPendencias.includes('Agendamento')) porArea[d.area].agendamento++;
+                if (d.resumoPendencias.includes('Rede')) porArea[d.area].rede++;
+                if (d.resumoPendencias.includes('SCRIPT') || d.resumoPendencias.includes('Ilha')) porArea[d.area].script++;
+            });
+
+            const tbody = document.getElementById('tbody-area');
+            tbody.innerHTML = '';
+            Object.keys(porArea).forEach(area => {
+                const item = porArea[area];
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-semibold text-slate-700">${area}</td>
+                        <td class="p-3">${item.recebidas}</td>
+                        <td class="p-3 text-emerald-600 font-semibold">${item.executadas}</td>
+                        <td class="p-3 text-amber-600 font-semibold">${item.pendentes}</td>
+                        <td class="p-3">${item.agendamento}</td>
+                        <td class="p-3">${item.rede}</td>
+                        <td class="p-3">${item.script}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function atualizarTabelaDetalhes(dados) {
+            const tbody = document.getElementById('tbody-detalhes');
+            tbody.innerHTML = '';
+            dados.forEach(d => {
+                const badgeClass = d.situacao === 'Executada em Campo' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50">
+                        <td class="p-3 font-bold text-indigo-900">${d.site}</td>
+                        <td class="p-3">${d.os}</td>
+                        <td class="p-3">${d.cidade}</td>
+                        <td class="p-3">${d.area}</td>
+                        <td class="p-3">${d.coordenador}</td>
+                        <td class="p-3">${d.dataCriacao}</td>
+                        <td class="p-3"><span class="px-2 py-1 text-xs rounded-full ${badgeClass}">${d.situacao}</span></td>
+                        <td class="p-3 font-semibold">${d.responsavel}</td>
+                        <td class="p-3 text-slate-500">${d.detalhes}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filtrarTabela() {
+            const termo = document.getElementById('busca-tabela').value.toLowerCase();
+            const linhas = document.querySelectorAll('#tbody-detalhes tr');
+            linhas.forEach(linha => {
+                const texto = linha.innerText.toLowerCase();
+                linha.style.display = texto.includes(termo) ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+</html>
