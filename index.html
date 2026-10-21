@@ -105,102 +105,94 @@
         </div>
     </section>
 
-    <!-- CARDS DE KPIS E VALORES FINANCEIROS REFORMULADOS -->
-    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3">
+    <!-- CARDS DE KPIS COM VALORES FINANCEIROS EMBUTIDOS -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         
-        <!-- Cards da Esquerda (5 Indicadores) -->
-        <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
-                <div class="flex justify-between items-center text-slate-400">
-                    <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
-                    <i class="fa-solid fa-circle-info text-xs"></i>
-                </div>
-                <p id="kpi-recebidas" class="text-2xl font-black text-slate-800 my-1">0</p>
-                <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-medium inline-block w-max">Recebidas</span>
+        <!-- Total Demandas -->
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="flex justify-between items-center text-slate-400">
+                <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
+                <i class="fa-solid fa-circle-info text-xs"></i>
             </div>
-
-            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
-                <div class="flex justify-between items-center text-slate-400">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
-                    <i class="fa-solid fa-circle-check text-xs text-emerald-500"></i>
-                </div>
-                <p id="kpi-executadas" class="text-2xl font-black text-emerald-600 my-1">0</p>
-                <span id="pct-executadas" class="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-bold inline-block w-max">0% do total</span>
-            </div>
-
-            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
-                <div class="flex justify-between items-center text-slate-400">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
-                    <i class="fa-solid fa-hourglass-half text-xs text-amber-500"></i>
-                </div>
-                <p id="kpi-pendentes" class="text-2xl font-black text-amber-600 my-1">0</p>
-                <span id="pct-pendentes" class="text-[10px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded font-bold inline-block w-max">0% do total</span>
-            </div>
-
-            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
-                <div class="flex justify-between items-center text-slate-400">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600">Imped. VIVO</span>
-                    <i class="fa-solid fa-triangle-exclamation text-xs text-rose-500"></i>
-                </div>
-                <p id="kpi-vivo" class="text-2xl font-black text-rose-600 my-1">0</p>
-                <span id="pct-vivo" class="text-[10px] bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded font-bold inline-block w-max">0% do total</span>
-            </div>
-
-            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
-                <div class="flex justify-between items-center text-slate-400">
-                    <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Imped. TEL</span>
-                    <i class="fa-solid fa-user-gear text-xs text-purple-500"></i>
-                </div>
-                <p id="kpi-tel" class="text-2xl font-black text-purple-600 my-1">0</p>
-                <span id="pct-tel" class="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded font-bold inline-block w-max">0% do total</span>
+            <p id="kpi-recebidas" class="text-2xl font-black text-slate-800 my-1">0</p>
+            <div class="border-t border-slate-100 pt-1.5 space-y-0.5">
+                <p id="fin-total-baremo" class="text-[10px] font-bold text-slate-700">Baremo: R$ 0,00</p>
+                <p id="fin-total-prisma" class="text-[10px] font-medium text-slate-500">Prisma: R$ 0,00</p>
             </div>
         </div>
 
-        <!-- Card Expandido da Direita: VALORES FINANCEIRO -->
-        <div class="lg:col-span-5 bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-1.5">
-                <span class="text-[11px] font-bold uppercase tracking-wider text-sky-600 flex items-center">
-                    <i class="fa-solid fa-coins text-sky-500 mr-1.5"></i>Valores Financeiro
+        <!-- Executadas -->
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between border-l-4 border-l-emerald-500">
+            <div class="flex justify-between items-center text-slate-400">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
+                <i class="fa-solid fa-circle-check text-xs text-emerald-500"></i>
+            </div>
+            <div class="flex items-baseline justify-between my-1">
+                <p id="kpi-executadas" class="text-2xl font-black text-emerald-600">0</p>
+                <span id="pct-executadas" class="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-bold">0%</span>
+            </div>
+            <div class="border-t border-slate-100 pt-1.5 space-y-0.5">
+                <p id="fin-exec-baremo" class="text-[10px] font-bold text-emerald-700">Baremo: R$ 0,00</p>
+                <p id="fin-exec-prisma" class="text-[10px] font-medium text-slate-500">Prisma: R$ 0,00</p>
+            </div>
+        </div>
+
+        <!-- Pendentes -->
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between border-l-4 border-l-amber-500">
+            <div class="flex justify-between items-center text-slate-400">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
+                <i class="fa-solid fa-hourglass-half text-xs text-amber-500"></i>
+            </div>
+            <div class="flex items-baseline justify-between my-1">
+                <p id="kpi-pendentes" class="text-2xl font-black text-amber-600">0</p>
+                <span id="pct-pendentes" class="text-[10px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded font-bold">0%</span>
+            </div>
+            <div class="border-t border-slate-100 pt-1.5 space-y-0.5">
+                <p id="fin-pend-baremo" class="text-[10px] font-bold text-amber-700">Baremo: R$ 0,00</p>
+                <p id="fin-pend-prisma" class="text-[10px] font-medium text-slate-500">Prisma: R$ 0,00</p>
+            </div>
+        </div>
+
+        <!-- Impedimento VIVO -->
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between border-l-4 border-l-rose-500">
+            <div class="flex justify-between items-center text-slate-400">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600">Imped. VIVO</span>
+                <i class="fa-solid fa-triangle-exclamation text-xs text-rose-500"></i>
+            </div>
+            <div class="flex items-baseline justify-between my-1">
+                <p id="kpi-vivo" class="text-2xl font-black text-rose-600">0</p>
+                <span id="pct-vivo" class="text-[10px] bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded font-bold">0%</span>
+            </div>
+            <div class="border-t border-slate-100 pt-1.5 space-y-0.5">
+                <p id="fin-vivo-baremo" class="text-[10px] font-bold text-rose-700">Baremo: R$ 0,00</p>
+                <p id="fin-vivo-prisma" class="text-[10px] font-medium text-slate-500">Prisma: R$ 0,00</p>
+            </div>
+        </div>
+
+        <!-- Card de Indicadores Financeiros Consolidados -->
+        <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between border-l-4 border-l-sky-500">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-1">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600 flex items-center">
+                    <i class="fa-solid fa-coins text-sky-500 mr-1"></i>Valores Prisma
                 </span>
-                <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
-                    Ponto Baremo Unitário: <strong class="text-slate-700">R$ 166,72</strong>
+                <span class="text-[9px] font-bold text-sky-700 bg-sky-50 border border-sky-100 px-1.5 py-0.5 rounded">
+                    Baremo Unit.: R$ 166,72
                 </span>
             </div>
 
-            <div class="grid grid-cols-2 gap-3 my-2">
-                <div class="bg-sky-50/50 p-2 rounded-lg border border-sky-100">
-                    <p class="text-[10px] font-bold text-sky-700 uppercase">Total Ponto Baremo</p>
-                    <p id="fin-baremo-total" class="text-lg font-black text-slate-800 mt-0.5">R$ 0,00</p>
-                </div>
-                <div class="bg-indigo-50/50 p-2 rounded-lg border border-indigo-100">
-                    <p class="text-[10px] font-bold text-indigo-700 uppercase">R$ Total Valor Prisma</p>
-                    <p id="fin-prisma-total" class="text-lg font-black text-slate-800 mt-0.5">R$ 0,00</p>
-                </div>
+            <div class="my-1.5">
+                <p class="text-[10px] font-bold text-slate-400 uppercase">R$ Total Valor Prisma</p>
+                <p id="fin-prisma-total" class="text-xl font-black text-slate-800">R$ 0,00</p>
             </div>
 
-            <!-- Detalhamento de R$ e % por Situação -->
-            <div class="grid grid-cols-3 gap-2 text-[10px] pt-1 border-t border-slate-100">
-                <div class="bg-emerald-50/60 p-1.5 rounded border border-emerald-100">
-                    <p class="font-bold text-emerald-700">Executadas</p>
-                    <p id="fin-executadas-val" class="font-black text-slate-800 text-xs my-0.5">R$ 0,00</p>
-                    <span id="fin-executadas-pct" class="text-[9px] text-emerald-700 font-semibold bg-emerald-100/80 px-1 py-0.2 rounded">0% financeiro</span>
-                </div>
-                <div class="bg-amber-50/60 p-1.5 rounded border border-amber-100">
-                    <p class="font-bold text-amber-700">Pendentes</p>
-                    <p id="fin-pendentes-val" class="font-black text-slate-800 text-xs my-0.5">R$ 0,00</p>
-                    <span id="fin-pendentes-pct" class="text-[9px] text-amber-700 font-semibold bg-amber-100/80 px-1 py-0.2 rounded">0% financeiro</span>
-                </div>
-                <div class="bg-rose-50/60 p-1.5 rounded border border-rose-100">
-                    <p class="font-bold text-rose-700">Imped. VIVO</p>
-                    <p id="fin-vivo-val" class="font-black text-slate-800 text-xs my-0.5">R$ 0,00</p>
-                    <span id="fin-vivo-pct" class="text-[9px] text-rose-700 font-semibold bg-rose-100/80 px-1 py-0.2 rounded">0% financeiro</span>
-                </div>
+            <div class="border-t border-slate-100 pt-1 text-[10px]">
+                <span class="text-slate-500">Consolidado Geral das Atividades</span>
             </div>
         </div>
 
     </section>
 
-    <!-- PAINEL DE FILTROS -->
+    <!-- PAINEL DE FILTROS (COM MÚLTIPLA SELEÇÃO DE MESES) -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -219,24 +211,28 @@
                     <option value="">Todos os Anos</option>
                 </select>
             </div>
-            <div>
-                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Mês</label>
-                <select id="filtro-mes" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
-                    <option value="">Todos os Meses</option>
-                    <option value="01">Janeiro</option>
-                    <option value="02">Fevereiro</option>
-                    <option value="03">Março</option>
-                    <option value="04">Abril</option>
-                    <option value="05">Maio</option>
-                    <option value="06">Junho</option>
-                    <option value="07">Julho</option>
-                    <option value="08">Agosto</option>
-                    <option value="09">Setembro</option>
-                    <option value="10">Outubro</option>
-                    <option value="11">Novembro</option>
-                    <option value="12">Dezembro</option>
+            
+            <!-- Seleção Múltipla de Meses -->
+            <div class="relative">
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                    Mês <span class="text-[9px] font-normal text-slate-400">(Multi-seleção)</span>
+                </label>
+                <select id="filtro-mes" multiple onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-1.5 h-20 focus:border-sky-500 focus:bg-white outline-none">
+                    <option value="01">01 - Janeiro</option>
+                    <option value="02">02 - Fevereiro</option>
+                    <option value="03">03 - Março</option>
+                    <option value="04">04 - Abril</option>
+                    <option value="05">05 - Maio</option>
+                    <option value="06">06 - Junho</option>
+                    <option value="07">07 - Julho</option>
+                    <option value="08">08 - Agosto</option>
+                    <option value="09">09 - Setembro</option>
+                    <option value="10">10 - Outubro</option>
+                    <option value="11">11 - Novembro</option>
+                    <option value="12">12 - Dezembro</option>
                 </select>
             </div>
+
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Área Operacional</label>
                 <select id="filtro-area" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
@@ -458,7 +454,9 @@
                 selectAno.value = anoAtual;
             }
             if (selectMes) {
-                selectMes.value = mesAtual;
+                Array.from(selectMes.options).forEach(opt => {
+                    opt.selected = (opt.value === mesAtual);
+                });
             }
         }
 
@@ -510,7 +508,10 @@
 
         function limparFiltros() {
             document.getElementById('filtro-ano').value = '';
-            document.getElementById('filtro-mes').value = '';
+            const selectMes = document.getElementById('filtro-mes');
+            if (selectMes) {
+                Array.from(selectMes.options).forEach(opt => opt.selected = false);
+            }
             document.getElementById('filtro-area').value = '';
             document.getElementById('filtro-coordenador').value = '';
             document.getElementById('filtro-situacao').value = '';
@@ -521,19 +522,23 @@
 
         function aplicarFiltros() {
             const ano = document.getElementById('filtro-ano')?.value || '';
-            const mes = document.getElementById('filtro-mes')?.value || '';
+            const selectMes = document.getElementById('filtro-mes');
+            const mesesSelecionados = selectMes ? Array.from(selectMes.selectedOptions).map(o => o.value) : [];
+
             const area = document.getElementById('filtro-area')?.value || '';
             const coord = document.getElementById('filtro-coordenador')?.value || '';
             const situacao = document.getElementById('filtro-situacao')?.value || '';
             const resp = document.getElementById('filtro-responsavel')?.value || '';
 
             const filtrados = dadosGlobais.filter(d => {
-                return (!ano || d.ano === ano) &&
-                       (!mes || d.mes === mes) &&
-                       (!area || d.area === area) &&
-                       (!coord || d.coordenador === coord) &&
-                       (!situacao || d.situacao === situacao) &&
-                       (!resp || d.responsavel === resp);
+                const matchAno = !ano || d.ano === ano;
+                const matchMes = mesesSelecionados.length === 0 || mesesSelecionados.includes(d.mes);
+                const matchArea = !area || d.area === area;
+                const matchCoord = !coord || d.coordenador === coord;
+                const matchSituacao = !situacao || d.situacao === situacao;
+                const matchResp = !resp || d.responsavel === resp;
+
+                return matchAno && matchMes && matchArea && matchCoord && matchSituacao && matchResp;
             });
 
             atualizarKPIsEFinanceiro(filtrados);
@@ -559,12 +564,10 @@
             const executadas = dados.filter(d => d.situacao === 'Executada em Campo').length;
             const pendentes = dados.filter(d => d.situacao === 'Pendente Execução').length;
             const vivo = dados.filter(d => d.responsavel === 'VIVO').length;
-            const tel = dados.filter(d => d.responsavel === 'TEL').length;
 
             const pctExec = total > 0 ? ((executadas / total) * 100).toFixed(1) : 0;
             const pctPend = total > 0 ? ((pendentes / total) * 100).toFixed(1) : 0;
             const pctVivo = total > 0 ? ((vivo / total) * 100).toFixed(1) : 0;
-            const pctTel = total > 0 ? ((tel / total) * 100).toFixed(1) : 0;
 
             if (document.getElementById('kpi-recebidas')) document.getElementById('kpi-recebidas').innerText = total;
             if (document.getElementById('kpi-executadas')) document.getElementById('kpi-executadas').innerText = executadas;
@@ -573,51 +576,55 @@
             if (document.getElementById('pct-pendentes')) document.getElementById('pct-pendentes').innerText = `${pctPend}% do total`;
             if (document.getElementById('kpi-vivo')) document.getElementById('kpi-vivo').innerText = vivo;
             if (document.getElementById('pct-vivo')) document.getElementById('pct-vivo').innerText = `${pctVivo}% do total`;
-            if (document.getElementById('kpi-tel')) document.getElementById('kpi-tel').innerText = tel;
-            if (document.getElementById('pct-tel')) document.getElementById('pct-tel').innerText = `${pctTel}% do total`;
 
-            // Cálculos Financeiros
-            let somaBaremoTotal = 0;
-            let somaPrismaTotal = 0;
+            // Cálculos Financeiros por Card
+            let totalBaremo = 0;
+            let totalPrisma = 0;
 
-            let finExecutadas = 0;
-            let finPendentes = 0;
-            let finVivo = 0;
+            let execBaremo = 0;
+            let execPrisma = 0;
+
+            let pendBaremo = 0;
+            let pendPrisma = 0;
+
+            let vivoBaremo = 0;
+            let vivoPrisma = 0;
 
             dados.forEach(d => {
                 const baremo = parseMoeda(d.pontoBaremo);
                 const prisma = parseMoeda(d.valorPrisma);
 
-                somaBaremoTotal += baremo;
-                somaPrismaTotal += prisma;
+                totalBaremo += baremo;
+                totalPrisma += prisma;
 
                 if (d.situacao === 'Executada em Campo') {
-                    finExecutadas += baremo;
+                    execBaremo += baremo;
+                    execPrisma += prisma;
                 } else if (d.situacao === 'Pendente Execução') {
-                    finPendentes += baremo;
+                    pendBaremo += baremo;
+                    pendPrisma += prisma;
                 }
 
                 if (d.responsavel === 'VIVO') {
-                    finVivo += baremo;
+                    vivoBaremo += baremo;
+                    vivoPrisma += prisma;
                 }
             });
 
-            const pctFinExec = somaBaremoTotal > 0 ? ((finExecutadas / somaBaremoTotal) * 100).toFixed(1) : 0;
-            const pctFinPend = somaBaremoTotal > 0 ? ((finPendentes / somaBaremoTotal) * 100).toFixed(1) : 0;
-            const pctFinVivo = somaBaremoTotal > 0 ? ((finVivo / somaBaremoTotal) * 100).toFixed(1) : 0;
+            // Preenchimento dos Valores nos Cards
+            if (document.getElementById('fin-total-baremo')) document.getElementById('fin-total-baremo').innerText = `Baremo: ${formatMoeda(totalBaremo)}`;
+            if (document.getElementById('fin-total-prisma')) document.getElementById('fin-total-prisma').innerText = `Prisma: ${formatMoeda(totalPrisma)}`;
 
-            // Preenchimento dos Cards Financeiros
-            if (document.getElementById('fin-baremo-total')) document.getElementById('fin-baremo-total').innerText = formatMoeda(somaBaremoTotal);
-            if (document.getElementById('fin-prisma-total')) document.getElementById('fin-prisma-total').innerText = formatMoeda(somaPrismaTotal);
+            if (document.getElementById('fin-exec-baremo')) document.getElementById('fin-exec-baremo').innerText = `Baremo: ${formatMoeda(execBaremo)}`;
+            if (document.getElementById('fin-exec-prisma')) document.getElementById('fin-exec-prisma').innerText = `Prisma: ${formatMoeda(execPrisma)}`;
 
-            if (document.getElementById('fin-executadas-val')) document.getElementById('fin-executadas-val').innerText = formatMoeda(finExecutadas);
-            if (document.getElementById('fin-executadas-pct')) document.getElementById('fin-executadas-pct').innerText = `${pctFinExec}% financeiro`;
+            if (document.getElementById('fin-pend-baremo')) document.getElementById('fin-pend-baremo').innerText = `Baremo: ${formatMoeda(pendBaremo)}`;
+            if (document.getElementById('fin-pend-prisma')) document.getElementById('fin-pend-prisma').innerText = `Prisma: ${formatMoeda(pendPrisma)}`;
 
-            if (document.getElementById('fin-pendentes-val')) document.getElementById('fin-pendentes-val').innerText = formatMoeda(finPendentes);
-            if (document.getElementById('fin-pendentes-pct')) document.getElementById('fin-pendentes-pct').innerText = `${pctFinPend}% financeiro`;
+            if (document.getElementById('fin-vivo-baremo')) document.getElementById('fin-vivo-baremo').innerText = `Baremo: ${formatMoeda(vivoBaremo)}`;
+            if (document.getElementById('fin-vivo-prisma')) document.getElementById('fin-vivo-prisma').innerText = `Prisma: ${formatMoeda(vivoPrisma)}`;
 
-            if (document.getElementById('fin-vivo-val')) document.getElementById('fin-vivo-val').innerText = formatMoeda(finVivo);
-            if (document.getElementById('fin-vivo-pct')) document.getElementById('fin-vivo-pct').innerText = `${pctFinVivo}% financeiro`;
+            if (document.getElementById('fin-prisma-total')) document.getElementById('fin-prisma-total').innerText = formatMoeda(totalPrisma);
         }
 
         function atualizarInsights(dados) {
