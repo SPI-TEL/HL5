@@ -61,6 +61,17 @@
         </div>
     </header>
 
+    <!-- BARRA COMPACTA DE SINCRONIZAÇÃO (ACIMA DO QUADRO DE INSIGHTS) -->
+    <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 flex items-center justify-between text-xs text-emerald-800">
+        <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
+            <span><strong>Sucesso:</strong> Base de dados sincronizada e atualizada em tempo real com a planilha.</span>
+        </div>
+        <span class="text-[11px] font-semibold text-amber-800 bg-amber-100/70 border border-amber-200 px-2.5 py-0.5 rounded-md">
+            Objetivo: Redução de Pendências & Agilidade nas Ativações 5G
+        </span>
+    </div>
+
     <!-- QUADRO DE INSIGHTS & DESTAQUES DA ANÁLISE -->
     <section class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
@@ -89,17 +100,6 @@
             </div>
         </div>
     </section>
-
-    <!-- BARRA COMPACTA DE SINCRONIZAÇÃO -->
-    <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 flex items-center justify-between text-xs text-emerald-800">
-        <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
-            <span><strong>Sucesso:</strong> Base de dados sincronizada e atualizada em tempo real com a planilha.</span>
-        </div>
-        <span class="text-[11px] font-semibold text-amber-800 bg-amber-100/70 border border-amber-200 px-2.5 py-0.5 rounded-md">
-            Objetivo: Redução de Pendências & Agilidade nas Ativações 5G
-        </span>
-    </div>
 
     <!-- CARDS DE KPIS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
@@ -164,7 +164,7 @@
 
     </section>
 
-    <!-- PAINEL DE FILTROS COM NOVO FILTRO PROGRAMADO (COLUNA U) -->
+    <!-- PAINEL DE FILTROS -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -231,7 +231,6 @@
                 </div>
             </div>
 
-            <!-- NOVO FILTRO PROGRAMADO (COLUNA U - PRIORIDADE VIVO) -->
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Programado</label>
                 <select id="filtro-programado" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
@@ -448,7 +447,7 @@
 
                 const dataCriacaoStr = getVal('Data Criação');
                 const previsaoStr = getVal('Previsão de execução');
-                const programadoVivoStr = getVal('Prioridade Vivo'); // Coluna U
+                const programadoVivoStr = getVal('Prioridade Vivo');
 
                 let ano = '';
                 let mes = '';
@@ -676,8 +675,10 @@
             const insExec = document.getElementById('insight-execucao');
             if (insExec) insExec.innerHTML = `Atualmente <strong>${pct}%</strong> das demandas (${executadas} de ${total}) foram executadas no período.`;
 
+            // Considera estritamente as pendentes
+            const pendentes = dados.filter(d => d.situacao !== 'Executada em Campo');
             const motivos = {};
-            dados.forEach(d => {
+            pendentes.forEach(d => {
                 if (d.resumoPendencias) motivos[d.resumoPendencias] = (motivos[d.resumoPendencias] || 0) + 1;
             });
 
@@ -793,12 +794,14 @@
             }
         };
 
+        // Gráfico de Distribuição das Pendências estritamente sobre as Pendentes
         function atualizarGraficoMotivos(dados) {
+            const pendentes = dados.filter(d => d.situacao !== 'Executada em Campo');
             const motivos = {};
             let totalPendencias = 0;
 
-            dados.forEach(d => {
-                const m = d.resumoPendencias || 'Sem Pendência';
+            pendentes.forEach(d => {
+                const m = d.resumoPendencias || 'Sem Resumo';
                 motivos[m] = (motivos[m] || 0) + 1;
                 totalPendencias++;
             });
@@ -860,10 +863,10 @@
             });
         }
 
+        // Tabela Consolidado por Área e Gráfico Situação da Atividade lendo a Coluna N (Situação Atividade)
         function atualizarTabelaAreaEChartSituacao(dados) {
             const porArea = {};
-            let totalExecutadas = 0;
-            let totalPendentes = 0;
+            const situacaoContagem = {};
 
             dados.forEach(d => {
                 if (!porArea[d.area]) {
@@ -879,11 +882,12 @@
                 }
                 porArea[d.area].recebidas++;
 
+                // Mapeamento da Coluna N (Situação Atividade)
+                const sitNome = d.situacao || 'Não Informado';
+                situacaoContagem[sitNome] = (situacaoContagem[sitNome] || 0) + 1;
+
                 if (d.situacao === 'Executada em Campo') {
                     porArea[d.area].executadas++;
-                    totalExecutadas++;
-                } else {
-                    totalPendentes++;
                 }
 
                 if (d.responsavel === 'VIVO') {
@@ -916,25 +920,29 @@
                 });
             }
 
+            // Renderização do Gráfico Situação da Atividade lendo a Coluna N
             const canvasSituacao = document.getElementById('chartSituacao');
             if (canvasSituacao) {
                 const ctx = canvasSituacao.getContext('2d');
                 if (chartSituacaoObj) chartSituacaoObj.destroy();
 
-                const totalGeral = totalExecutadas + totalPendentes;
-                const pctExec = totalGeral > 0 ? ((totalExecutadas / totalGeral) * 100).toFixed(1) : 0;
-                const pctPend = totalGeral > 0 ? ((totalPendentes / totalGeral) * 100).toFixed(1) : 0;
+                const totalGeral = dados.length;
+                const labelsSituacao = Object.keys(situacaoContagem).map(k => {
+                    const val = situacaoContagem[k];
+                    const pct = totalGeral > 0 ? ((val / totalGeral) * 100).toFixed(1) : 0;
+                    return `${k} (${val} - ${pct}%)`;
+                });
+
+                const valoresSituacao = Object.values(situacaoContagem);
+                const cores = ['#10b981', '#f59e0b', '#8b5cf6', '#0284c7', '#ef4444', '#ec4899'];
 
                 chartSituacaoObj = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: [
-                            `Executada em Campo (${totalExecutadas} - ${pctExec}%)`, 
-                            `Pendente Execução (${totalPendentes} - ${pctPend}%)`
-                        ],
+                        labels: labelsSituacao,
                         datasets: [{
-                            data: [totalExecutadas, totalPendentes],
-                            backgroundColor: ['#10b981', '#f59e0b'],
+                            data: valoresSituacao,
+                            backgroundColor: cores.slice(0, valoresSituacao.length),
                             borderWidth: 2,
                             borderColor: '#ffffff'
                         }]
@@ -984,9 +992,8 @@
             });
         }
 
-        // Função de Exportação CSV corrigida com BOM UTF-8 (\uFEFF)
         function exportarCSV() {
-            let csv = '\uFEFF'; // Adiciona BOM para forçar codificação correta no Excel
+            let csv = '\uFEFF';
             csv += 'Site,OS PRISMA,Cidade,Área,Coordenador TEL,Data Criação,Previsão Execução,Situação,Programado Vivo,Responsável,Detalhes\n';
             
             dadosGlobais.forEach(d => {
