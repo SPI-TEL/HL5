@@ -105,61 +105,99 @@
         </div>
     </section>
 
-    <!-- CARDS DE KPIS -->
-    <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-            <div class="flex justify-between items-center text-slate-400">
-                <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
-                <i class="fa-solid fa-circle-info text-xs"></i>
+    <!-- CARDS DE KPIS E VALORES FINANCEIROS REFORMULADOS -->
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-3">
+        
+        <!-- Cards da Esquerda (5 Indicadores) -->
+        <div class="lg:col-span-7 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                <div class="flex justify-between items-center text-slate-400">
+                    <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
+                    <i class="fa-solid fa-circle-info text-xs"></i>
+                </div>
+                <p id="kpi-recebidas" class="text-2xl font-black text-slate-800 my-1">0</p>
+                <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-medium inline-block w-max">Recebidas</span>
             </div>
-            <p id="kpi-recebidas" class="text-2xl font-black text-slate-800 mt-2">0</p>
-            <span class="text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-medium mt-1 inline-block">Recebidas</span>
+
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                <div class="flex justify-between items-center text-slate-400">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
+                    <i class="fa-solid fa-circle-check text-xs text-emerald-500"></i>
+                </div>
+                <p id="kpi-executadas" class="text-2xl font-black text-emerald-600 my-1">0</p>
+                <span id="pct-executadas" class="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-bold inline-block w-max">0% do total</span>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                <div class="flex justify-between items-center text-slate-400">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
+                    <i class="fa-solid fa-hourglass-half text-xs text-amber-500"></i>
+                </div>
+                <p id="kpi-pendentes" class="text-2xl font-black text-amber-600 my-1">0</p>
+                <span id="pct-pendentes" class="text-[10px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded font-bold inline-block w-max">0% do total</span>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                <div class="flex justify-between items-center text-slate-400">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600">Imped. VIVO</span>
+                    <i class="fa-solid fa-triangle-exclamation text-xs text-rose-500"></i>
+                </div>
+                <p id="kpi-vivo" class="text-2xl font-black text-rose-600 my-1">0</p>
+                <span id="pct-vivo" class="text-[10px] bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded font-bold inline-block w-max">0% do total</span>
+            </div>
+
+            <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm relative flex flex-col justify-between">
+                <div class="flex justify-between items-center text-slate-400">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Imped. TEL</span>
+                    <i class="fa-solid fa-user-gear text-xs text-purple-500"></i>
+                </div>
+                <p id="kpi-tel" class="text-2xl font-black text-purple-600 my-1">0</p>
+                <span id="pct-tel" class="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded font-bold inline-block w-max">0% do total</span>
+            </div>
         </div>
 
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-            <div class="flex justify-between items-center text-slate-400">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
-                <i class="fa-solid fa-circle-check text-xs text-emerald-500"></i>
+        <!-- Card Expandido da Direita: VALORES FINANCEIRO -->
+        <div class="lg:col-span-5 bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-1.5">
+                <span class="text-[11px] font-bold uppercase tracking-wider text-sky-600 flex items-center">
+                    <i class="fa-solid fa-coins text-sky-500 mr-1.5"></i>Valores Financeiro
+                </span>
+                <span class="text-[10px] font-semibold text-slate-400 bg-slate-50 px-2 py-0.5 rounded border border-slate-100">
+                    Ponto Baremo Unitário: <strong class="text-slate-700">R$ 166,72</strong>
+                </span>
             </div>
-            <p id="kpi-executadas" class="text-2xl font-black text-emerald-600 mt-2">0</p>
-            <span id="pct-executadas" class="text-[10px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-bold mt-1 inline-block">0%</span>
+
+            <div class="grid grid-cols-2 gap-3 my-2">
+                <div class="bg-sky-50/50 p-2 rounded-lg border border-sky-100">
+                    <p class="text-[10px] font-bold text-sky-700 uppercase">Total Ponto Baremo</p>
+                    <p id="fin-baremo-total" class="text-lg font-black text-slate-800 mt-0.5">R$ 0,00</p>
+                </div>
+                <div class="bg-indigo-50/50 p-2 rounded-lg border border-indigo-100">
+                    <p class="text-[10px] font-bold text-indigo-700 uppercase">R$ Total Valor Prisma</p>
+                    <p id="fin-prisma-total" class="text-lg font-black text-slate-800 mt-0.5">R$ 0,00</p>
+                </div>
+            </div>
+
+            <!-- Detalhamento de R$ e % por Situação -->
+            <div class="grid grid-cols-3 gap-2 text-[10px] pt-1 border-t border-slate-100">
+                <div class="bg-emerald-50/60 p-1.5 rounded border border-emerald-100">
+                    <p class="font-bold text-emerald-700">Executadas</p>
+                    <p id="fin-executadas-val" class="font-black text-slate-800 text-xs my-0.5">R$ 0,00</p>
+                    <span id="fin-executadas-pct" class="text-[9px] text-emerald-700 font-semibold bg-emerald-100/80 px-1 py-0.2 rounded">0% financeiro</span>
+                </div>
+                <div class="bg-amber-50/60 p-1.5 rounded border border-amber-100">
+                    <p class="font-bold text-amber-700">Pendentes</p>
+                    <p id="fin-pendentes-val" class="font-black text-slate-800 text-xs my-0.5">R$ 0,00</p>
+                    <span id="fin-pendentes-pct" class="text-[9px] text-amber-700 font-semibold bg-amber-100/80 px-1 py-0.2 rounded">0% financeiro</span>
+                </div>
+                <div class="bg-rose-50/60 p-1.5 rounded border border-rose-100">
+                    <p class="font-bold text-rose-700">Imped. VIVO</p>
+                    <p id="fin-vivo-val" class="font-black text-slate-800 text-xs my-0.5">R$ 0,00</p>
+                    <span id="fin-vivo-pct" class="text-[9px] text-rose-700 font-semibold bg-rose-100/80 px-1 py-0.2 rounded">0% financeiro</span>
+                </div>
+            </div>
         </div>
 
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-            <div class="flex justify-between items-center text-slate-400">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
-                <i class="fa-solid fa-hourglass-half text-xs text-amber-500"></i>
-            </div>
-            <p id="kpi-pendentes" class="text-2xl font-black text-amber-600 mt-2">0</p>
-            <span id="pct-pendentes" class="text-[10px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded font-bold mt-1 inline-block">0%</span>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-            <div class="flex justify-between items-center text-slate-400">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600">Impedimento Vivo</span>
-                <i class="fa-solid fa-triangle-exclamation text-xs text-rose-500"></i>
-            </div>
-            <p id="kpi-vivo" class="text-2xl font-black text-rose-600 mt-2">0</p>
-            <span class="text-[10px] bg-rose-50 text-rose-700 px-1.5 py-0.5 rounded font-medium mt-1 inline-block">Responsável Vivo</span>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-            <div class="flex justify-between items-center text-slate-400">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Impedimento TEL</span>
-                <i class="fa-solid fa-user-gear text-xs text-purple-500"></i>
-            </div>
-            <p id="kpi-tel" class="text-2xl font-black text-purple-600 mt-2">0</p>
-            <span class="text-[10px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded font-medium mt-1 inline-block">Responsável TEL</span>
-        </div>
-
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm relative overflow-hidden">
-            <div class="flex justify-between items-center text-slate-400">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600">Ponto Baremo</span>
-                <i class="fa-solid fa-coins text-xs text-sky-500"></i>
-            </div>
-            <p id="kpi-baremo" class="text-base font-black text-slate-800 mt-2">R$ 0,00</p>
-            <span class="text-[10px] bg-sky-50 text-sky-700 px-1.5 py-0.5 rounded font-medium mt-1 inline-block">Total Financeiro</span>
-        </div>
     </section>
 
     <!-- PAINEL DE FILTROS -->
@@ -350,7 +388,7 @@
         function processarResultados(rawRows) {
             dadosGlobais = rawRows.map(item => {
                 const getVal = (chave) => {
-                    const keyEncontrada = Object.keys(item).find(k => k.trim() === chave.trim());
+                    const keyEncontrada = Object.keys(item).find(k => k.trim().toLowerCase() === chave.trim().toLowerCase());
                     return keyEncontrada ? item[keyEncontrada] : '';
                 };
 
@@ -367,7 +405,6 @@
                         const p2 = partes[1].padStart(2, '0');
                         const p3 = partes[2].length === 2 ? '20' + partes[2] : partes[2];
                         
-                        // Assumindo formato de origem MM/DD/YYYY
                         mes = p1;
                         const dia = p2;
                         ano = p3;
@@ -392,7 +429,8 @@
                     responsavel: getVal('Responsavel'),
                     detalhes: getVal('Detalhes_Informações'),
                     resumoPendencias: getVal('Resumo Pendencias'),
-                    pontoBaremo: getVal('Ponto Baremo') || '0'
+                    pontoBaremo: getVal('Ponto Baremo') || '0',
+                    valorPrisma: getVal('Valor Prisma') || '0'
                 };
             }).filter(d => d.site !== '');
 
@@ -498,7 +536,7 @@
                        (!resp || d.responsavel === resp);
             });
 
-            atualizarKPIs(filtrados);
+            atualizarKPIsEFinanceiro(filtrados);
             atualizarInsights(filtrados);
             atualizarGraficoEvolucao(filtrados);
             atualizarGraficoMotivos(filtrados);
@@ -506,21 +544,27 @@
             atualizarTabelaDetalhes(filtrados);
         }
 
-        function atualizarKPIs(dados) {
+        function parseMoeda(str) {
+            if (!str) return 0;
+            let val = String(str).replace('R$', '').replace(/\./g, '').replace(',', '.').trim();
+            return parseFloat(val) || 0;
+        }
+
+        function formatMoeda(num) {
+            return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function atualizarKPIsEFinanceiro(dados) {
             const total = dados.length;
             const executadas = dados.filter(d => d.situacao === 'Executada em Campo').length;
             const pendentes = dados.filter(d => d.situacao === 'Pendente Execução').length;
             const vivo = dados.filter(d => d.responsavel === 'VIVO').length;
             const tel = dados.filter(d => d.responsavel === 'TEL').length;
 
-            let somaBaremo = 0;
-            dados.forEach(d => {
-                let val = String(d.pontoBaremo).replace('R$', '').replace('.', '').replace(',', '.').trim();
-                somaBaremo += parseFloat(val) || 0;
-            });
-
             const pctExec = total > 0 ? ((executadas / total) * 100).toFixed(1) : 0;
             const pctPend = total > 0 ? ((pendentes / total) * 100).toFixed(1) : 0;
+            const pctVivo = total > 0 ? ((vivo / total) * 100).toFixed(1) : 0;
+            const pctTel = total > 0 ? ((tel / total) * 100).toFixed(1) : 0;
 
             if (document.getElementById('kpi-recebidas')) document.getElementById('kpi-recebidas').innerText = total;
             if (document.getElementById('kpi-executadas')) document.getElementById('kpi-executadas').innerText = executadas;
@@ -528,8 +572,52 @@
             if (document.getElementById('kpi-pendentes')) document.getElementById('kpi-pendentes').innerText = pendentes;
             if (document.getElementById('pct-pendentes')) document.getElementById('pct-pendentes').innerText = `${pctPend}% do total`;
             if (document.getElementById('kpi-vivo')) document.getElementById('kpi-vivo').innerText = vivo;
+            if (document.getElementById('pct-vivo')) document.getElementById('pct-vivo').innerText = `${pctVivo}% do total`;
             if (document.getElementById('kpi-tel')) document.getElementById('kpi-tel').innerText = tel;
-            if (document.getElementById('kpi-baremo')) document.getElementById('kpi-baremo').innerText = somaBaremo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            if (document.getElementById('pct-tel')) document.getElementById('pct-tel').innerText = `${pctTel}% do total`;
+
+            // Cálculos Financeiros
+            let somaBaremoTotal = 0;
+            let somaPrismaTotal = 0;
+
+            let finExecutadas = 0;
+            let finPendentes = 0;
+            let finVivo = 0;
+
+            dados.forEach(d => {
+                const baremo = parseMoeda(d.pontoBaremo);
+                const prisma = parseMoeda(d.valorPrisma);
+
+                somaBaremoTotal += baremo;
+                somaPrismaTotal += prisma;
+
+                if (d.situacao === 'Executada em Campo') {
+                    finExecutadas += baremo;
+                } else if (d.situacao === 'Pendente Execução') {
+                    finPendentes += baremo;
+                }
+
+                if (d.responsavel === 'VIVO') {
+                    finVivo += baremo;
+                }
+            });
+
+            const pctFinExec = somaBaremoTotal > 0 ? ((finExecutadas / somaBaremoTotal) * 100).toFixed(1) : 0;
+            const pctFinPend = somaBaremoTotal > 0 ? ((finPendentes / somaBaremoTotal) * 100).toFixed(1) : 0;
+            const pctFinVivo = somaBaremoTotal > 0 ? ((finVivo / somaBaremoTotal) * 100).toFixed(1) : 0;
+
+            // Preenchimento dos Cards Financeiros
+            if (document.getElementById('fin-baremo-total')) document.getElementById('fin-baremo-total').innerText = formatMoeda(somaBaremoTotal);
+            if (document.getElementById('fin-prisma-total')) document.getElementById('fin-prisma-total').innerText = formatMoeda(somaPrismaTotal);
+
+            if (document.getElementById('fin-executadas-val')) document.getElementById('fin-executadas-val').innerText = formatMoeda(finExecutadas);
+            if (document.getElementById('fin-executadas-pct')) document.getElementById('fin-executadas-pct').innerText = `${pctFinExec}% financeiro`;
+
+            if (document.getElementById('fin-pendentes-val')) document.getElementById('fin-pendentes-val').innerText = formatMoeda(finPendentes);
+            if (document.getElementById('fin-pendentes-pct')) document.getElementById('fin-pendentes-pct').innerText = `${pctFinPend}% financeiro`;
+
+            if (document.getElementById('fin-vivo-val')) document.getElementById('fin-vivo-val').innerText = formatMoeda(finVivo);
+            if (document.getElementById('fin-vivo-pct')) document.getElementById('fin-vivo-pct').innerText = `${pctFinVivo}% financeiro`;
         }
 
         function atualizarInsights(dados) {
@@ -559,15 +647,13 @@
 
             let somaBaremo = 0;
             dados.forEach(d => {
-                let val = String(d.pontoBaremo).replace('R$', '').replace('.', '').replace(',', '.').trim();
-                somaBaremo += parseFloat(val) || 0;
+                somaBaremo += parseMoeda(d.pontoBaremo);
             });
             const insBaremo = document.getElementById('insight-baremo');
-            if (insBaremo) insBaremo.innerHTML = `Valor acumulado de <strong>${somaBaremo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong> no período selecionado.`;
+            if (insBaremo) insBaremo.innerHTML = `Valor acumulado de <strong>${formatMoeda(somaBaremo)}</strong> no período selecionado.`;
         }
 
         function atualizarGraficoEvolucao(dados) {
-            // Agrupar datas por ISO para ordenar cronologicamente
             const mapaDatas = {};
             dados.forEach(d => {
                 if (d.dataIso) {
@@ -586,7 +672,6 @@
             const recebidas = chavesIso.map(k => mapaDatas[k].recebidas);
             const executadas = chavesIso.map(k => mapaDatas[k].executadas);
 
-            // Calcular Saldo Acumulado cronologicamente
             let acumuladoRecebidas = 0;
             let acumuladoExecutadas = 0;
             const saldoAcumulado = chavesIso.map(k => {
