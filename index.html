@@ -63,7 +63,7 @@
         </div>
     </header>
 
-    <!-- BARRA COMPACTA DE SINCRONIZAÇÃO -->
+    <!-- BARRA COMPACTA DE SINCRONIZAÇÃO (ACIMA DO QUADRO DE INSIGHTS) -->
     <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 flex items-center justify-between text-xs text-emerald-800">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
@@ -258,6 +258,8 @@
                     <option value="">Todas as Situações</option>
                 </select>
             </div>
+
+            <!-- FILTRO RESPONSÁVEL PENDÊNCIA (COLUNA X) -->
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Responsável Pendência</label>
                 <select id="filtro-responsavel" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
@@ -306,7 +308,6 @@
             </div>
         </section>
 
-        <!-- SITUAÇÃO DA ATIVIDADE REORGANIZADO IDENTICO À FOTO -->
         <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">SITUAÇÃO DA ATIVIDADE</h3>
             <div class="h-64 flex items-center justify-center relative p-2">
@@ -315,7 +316,7 @@
         </section>
     </div>
 
-    <!-- TABELA DETALHADA -->
+    <!-- TABELA DETALHADA COM COLUNA REPROGRAMAÇÃO (COLUNA Y) E BOTÃO VER OBSERVAÇÕES (COLUNA V) -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">DETALHAMENTO OPERACIONAL DAS DEMANDAS</h3>
@@ -325,7 +326,7 @@
             </div>
         </div>
         <div class="overflow-x-auto max-h-96 border border-slate-100 rounded-xl">
-            <table class="w-full text-xs text-left text-slate-600 min-w-[1000px]">
+            <table class="w-full text-xs text-left text-slate-600 min-w-[1100px]">
                 <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 sticky top-0 z-10">
                     <tr>
                         <th class="py-3 px-4">Site</th>
@@ -337,7 +338,8 @@
                         <th class="py-3 px-4">Previsão Execução</th>
                         <th class="py-3 px-4">Situação</th>
                         <th class="py-3 px-4">Programado (Vivo)</th>
-                        <th class="py-3 px-4">Detalhes / Pendência</th>
+                        <th class="py-3 px-4 text-center">Reprogramações</th>
+                        <th class="py-3 px-4 text-center">Observações</th>
                     </tr>
                 </thead>
                 <tbody id="tbody-detalhes" class="divide-y divide-slate-100"></tbody>
@@ -345,8 +347,30 @@
         </div>
     </section>
 
+    <!-- MODAL DE OBSERVAÇÕES (COLUNA V) -->
+    <div id="modal-obs" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl border border-slate-100 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-comment-dots text-sky-500 text-lg"></i>
+                    <h4 class="font-bold text-slate-800 text-sm">Observações da Demanda: <span id="modal-site" class="text-sky-600"></span></h4>
+                </div>
+                <button onclick="fecharModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs text-slate-700 font-mono whitespace-pre-wrap max-h-72 overflow-y-auto leading-relaxed" id="modal-texto">
+                Sem informações cadastradas.
+            </div>
+            <div class="text-right">
+                <button onclick="fecharModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs px-4 py-2 rounded-xl transition">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Registrar plugin de datalabels do Chart.js
         Chart.register(ChartDataLabels);
 
         const CSV_ORIGINAL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSal4I1LQGFkVZipyOLlY_OMR4LFLofU-dOSHZprenGm0aBMcxuEDNnnHkI5jfeuj7WTNwuVrs1zp65/pub?gid=1085677200&single=true&output=csv';
@@ -387,6 +411,16 @@
             }
 
             aplicarFiltros();
+        }
+
+        function abrirModalObs(site, texto) {
+            document.getElementById('modal-site').innerText = site;
+            document.getElementById('modal-texto').innerText = texto || 'Sem observações registradas na Coluna V.';
+            document.getElementById('modal-obs').classList.remove('hidden');
+        }
+
+        function fecharModal() {
+            document.getElementById('modal-obs').classList.add('hidden');
         }
 
         async function carregarDados() {
@@ -462,7 +496,14 @@
 
                 if (dataCriacaoStr) {
                     const partes = dataCriacaoStr.split('/');
-                    if (partes.length === 3) {
+                    if (partes.length === 2) {
+                        const p1 = partes[0].padStart(2, '0');
+                        const p2 = partes[1].padStart(2, '0');
+                        mes = p1;
+                        ano = new Date().getFullYear().toString();
+                        dataFormatadaBr = `${p2}/${mes}/${ano}`;
+                        dataIso = `${ano}-${mes}-${p2}`;
+                    } else if (partes.length === 3) {
                         const p1 = partes[0].padStart(2, '0');
                         const p2 = partes[1].padStart(2, '0');
                         const p3 = partes[2].length === 2 ? '20' + partes[2] : partes[2];
@@ -491,8 +532,9 @@
                     mes: mes,
                     situacao: getVal('Situação Atividade'),
                     responsavel: getVal('Responsavel'),
-                    detalhes: getVal('Detalhes_Informações'),
-                    resumoPendencias: getVal('Resumo Pendencias'),
+                    detalhes: getVal('Detalhes_Informações'), // Coluna V (Observações)
+                    resumoPendencias: getVal('Resumo Pendencias'), // Coluna X (Responsável Pendência)
+                    reprogramacao: getVal('Resumo Pendencias') || getVal('Reprogramacao') || '0', // Coluna Y
                     pontoBaremo: getVal('Ponto Baremo') || '0',
                     valorPrisma: getVal('Valor Prisma') || '0'
                 };
@@ -554,14 +596,14 @@
             const areas = [...new Set(dados.map(d => d.area))].sort();
             const coords = [...new Set(dados.map(d => d.coordenador))].sort();
             const situacoes = [...new Set(dados.map(d => d.situacao))].sort();
-            const responsaveis = [...new Set(dados.map(d => d.responsavel))].sort();
+            const responsaveisPend = [...new Set(dados.map(d => d.resumoPendencias).filter(r => r !== ''))].sort(); // Mapeia Coluna X
 
             preencherSelect('filtro-ano', anos);
             preencherSelect('filtro-programado', programados);
             preencherSelect('filtro-area', areas);
             preencherSelect('filtro-coordenador', coords);
             preencherSelect('filtro-situacao', situacoes);
-            preencherSelect('filtro-responsavel', responsaveis);
+            preencherSelect('filtro-responsavel', responsaveisPend);
         }
 
         function preencherSelect(id, lista) {
@@ -575,10 +617,11 @@
             select.value = valAtual;
         }
 
+        // Limpeza de filtros ultrarrápida
         function limparFiltros() {
             document.getElementById('filtro-ano').value = '';
             document.querySelectorAll('.chk-mes').forEach(c => c.checked = false);
-            atualizarSelecaoMeses();
+            document.getElementById("label-meses-sel").innerText = "Todos os Meses";
 
             document.getElementById('filtro-programado').value = '';
             document.getElementById('filtro-area').value = '';
@@ -586,6 +629,7 @@
             document.getElementById('filtro-situacao').value = '';
             document.getElementById('filtro-responsavel').value = '';
             document.getElementById('busca-tabela').value = '';
+
             aplicarFiltros();
         }
 
@@ -597,7 +641,7 @@
             const area = document.getElementById('filtro-area')?.value || '';
             const coord = document.getElementById('filtro-coordenador')?.value || '';
             const situacao = document.getElementById('filtro-situacao')?.value || '';
-            const resp = document.getElementById('filtro-responsavel')?.value || '';
+            const respPend = document.getElementById('filtro-responsavel')?.value || ''; // Coluna X
 
             const filtrados = dadosGlobais.filter(d => {
                 const matchAno = !ano || d.ano === ano;
@@ -606,9 +650,9 @@
                 const matchArea = !area || d.area === area;
                 const matchCoord = !coord || d.coordenador === coord;
                 const matchSituacao = !situacao || d.situacao === situacao;
-                const matchResp = !resp || d.responsavel === resp;
+                const matchRespPend = !respPend || d.resumoPendencias === respPend;
 
-                return matchAno && matchMes && matchProgramado && matchArea && matchCoord && matchSituacao && matchResp;
+                return matchAno && matchMes && matchProgramado && matchArea && matchCoord && matchSituacao && matchRespPend;
             });
 
             atualizarKPIsEFinanceiro(filtrados);
@@ -871,7 +915,6 @@
             });
         }
 
-        // Gráfico Situação da Atividade Reorganizado Identico à Foto
         function atualizarTabelaAreaEChartSituacao(dados) {
             const porArea = {};
             const situacaoContagem = {};
@@ -927,7 +970,6 @@
                 });
             }
 
-            // Gráfico Situação da Atividade idêntico à Imagem 26
             const canvasSituacao = document.getElementById('chartSituacao');
             if (canvasSituacao) {
                 const ctx = canvasSituacao.getContext('2d');
@@ -935,11 +977,10 @@
 
                 const totalGeral = dados.length;
                 
-                // Mapeamento de cores padronizadas conforme foto da requisição
                 const colorMap = {
-                    'Pendente Execução': '#10b981',  // Verde
-                    'Executada em Campo': '#f59e0b', // Amarelo/Laranja
-                    'Pendencia Vivo': '#8b5cf6'      // Roxo
+                    'Pendente Execução': '#10b981',  
+                    'Executada em Campo': '#f59e0b', 
+                    'Pendencia Vivo': '#8b5cf6'      
                 };
 
                 const labels = Object.keys(situacaoContagem);
@@ -965,7 +1006,7 @@
                         },
                         plugins: {
                             legend: {
-                                display: false // Desabilita legenda padrão para exibir rótulos flutuantes com datalabels
+                                display: false 
                             },
                             datalabels: {
                                 color: '#475569',
@@ -996,6 +1037,10 @@
             tbody.innerHTML = '';
             dados.forEach(d => {
                 const badgeClass = d.situacao === 'Executada em Campo' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200';
+                
+                // Trata o texto das observações para o modal
+                const obsTexto = (d.detalhes || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition">
                         <td class="py-2.5 px-4 font-bold text-sky-600 whitespace-nowrap">${d.site}</td>
@@ -1007,7 +1052,13 @@
                         <td class="py-2.5 px-4 text-slate-600 whitespace-nowrap font-semibold">${d.previsaoExecucao || '-'}</td>
                         <td class="py-2.5 px-4 whitespace-nowrap"><span class="px-2.5 py-1 text-[10px] rounded-md font-bold ${badgeClass}">${d.situacao}</span></td>
                         <td class="py-2.5 px-4 text-slate-700 whitespace-nowrap font-medium">${d.programadoVivo || '-'}</td>
-                        <td class="py-2.5 px-4 text-slate-500">${d.detalhes}</td>
+                        <td class="py-2.5 px-4 text-center whitespace-nowrap font-semibold text-slate-700">${d.reprogramacao || '0'}</td>
+                        <td class="py-2.5 px-4 text-center whitespace-nowrap">
+                            <button onclick="abrirModalObs('${d.site}', '${obsTexto}')" class="bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 text-[10px] font-bold px-2.5 py-1 rounded-lg transition flex items-center justify-center space-x-1 mx-auto">
+                                <i class="fa-regular fa-eye"></i>
+                                <span>Ver Obs</span>
+                            </button>
+                        </td>
                     </tr>
                 `;
             });
@@ -1023,11 +1074,11 @@
 
         function exportarCSV() {
             let csv = '\uFEFF';
-            csv += 'Site,OS PRISMA,Cidade,Área,Coordenador TEL,Data Criação,Previsão Execução,Situação,Programado Vivo,Responsável,Detalhes\n';
+            csv += 'Site,OS PRISMA,Cidade,Área,Coordenador TEL,Data Criação,Previsão Execução,Situação,Programado Vivo,Reprogramação,Responsável Pendência,Detalhes\n';
             
             dadosGlobais.forEach(d => {
                 const tratar = (txt) => `"${String(txt || '').replace(/"/g, '""')}"`;
-                csv += `${tratar(d.site)},${tratar(d.os)},${tratar(d.cidade)},${tratar(d.area)},${tratar(d.coordenador)},${tratar(d.dataBr || d.dataCriacao)},${tratar(d.previsaoExecucao)},${tratar(d.situacao)},${tratar(d.programadoVivo)},${tratar(d.responsavel)},${tratar(d.detalhes)}\n`;
+                csv += `${tratar(d.site)},${tratar(d.os)},${tratar(d.cidade)},${tratar(d.area)},${tratar(d.coordenador)},${tratar(d.dataBr || d.dataCriacao)},${tratar(d.previsaoExecucao)},${tratar(d.situacao)},${tratar(d.programadoVivo)},${tratar(d.reprogramacao)},${tratar(d.resumoPendencias)},${tratar(d.detalhes)}\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
