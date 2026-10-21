@@ -65,7 +65,7 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
         <div class="md:col-span-3 bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center space-x-2 text-xs text-emerald-800 font-medium">
             <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
-            <span><strong>Sucesso:</strong> Base de dados sincronizada e atualizada em tempo real com a nova planilha.</span>
+            <span><strong>Sucesso:</strong> Base de dados sincronizada e atualizada em tempo real com a planilha.</span>
         </div>
         <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 flex items-center justify-center text-xs text-amber-800 font-semibold text-center">
             Objetivo: Redução de Pendências & Agilidade nas Ativações 5G
@@ -162,7 +162,7 @@
         </div>
     </section>
 
-    <!-- PAINEL DE FILTROS APRIMORADO -->
+    <!-- PAINEL DE FILTROS -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -229,14 +229,14 @@
     <!-- GRÁFICOS GERENCIAIS -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div class="lg:col-span-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Demanda x Execução por Data de Criação</h3>
-            <div class="h-60">
+            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Demanda x Execução por Dia (com Saldo Acumulado)</h3>
+            <div class="h-64">
                 <canvas id="chartEvolucao"></canvas>
             </div>
         </div>
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Distribuição das Pendências</h3>
-            <div class="h-60 flex items-center justify-center">
+            <div class="h-64 flex items-center justify-center">
                 <canvas id="chartMotivos"></canvas>
             </div>
         </div>
@@ -293,7 +293,6 @@
     </section>
 
     <script>
-        // Nova URL da Planilha
         const CSV_ORIGINAL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSal4I1LQGFkVZipyOLlY_OMR4LFLofU-dOSHZprenGm0aBMcxuEDNnnHkI5jfeuj7WTNwuVrs1zp65/pub?gid=1085677200&single=true&output=csv';
         const PROXY_RAPIDO = 'https://corsproxy.io/?';
         const PROXY_BACKUP = 'https://api.allorigins.win/raw?url=';
@@ -358,12 +357,23 @@
                 const dataCriacaoStr = getVal('Data Criação');
                 let ano = '';
                 let mes = '';
+                let dataFormatadaBr = dataCriacaoStr;
+                let dataIso = '';
 
                 if (dataCriacaoStr) {
                     const partes = dataCriacaoStr.split('/');
                     if (partes.length === 3) {
-                        mes = partes[0].padStart(2, '0');
-                        ano = partes[2].length === 2 ? '20' + partes[2] : partes[2];
+                        const p1 = partes[0].padStart(2, '0');
+                        const p2 = partes[1].padStart(2, '0');
+                        const p3 = partes[2].length === 2 ? '20' + partes[2] : partes[2];
+                        
+                        // Assumindo formato de origem MM/DD/YYYY
+                        mes = p1;
+                        const dia = p2;
+                        ano = p3;
+                        
+                        dataFormatadaBr = `${dia}/${mes}/${ano}`;
+                        dataIso = `${ano}-${mes}-${dia}`;
                     }
                 }
 
@@ -374,6 +384,8 @@
                     area: getVal('Area') || 'Outros',
                     coordenador: getVal('Coordenador TEL') || 'N/I',
                     dataCriacao: dataCriacaoStr,
+                    dataBr: dataFormatadaBr,
+                    dataIso: dataIso,
                     ano: ano,
                     mes: mes,
                     situacao: getVal('Situação Atividade'),
@@ -555,9 +567,33 @@
         }
 
         function atualizarGraficoEvolucao(dados) {
-            const datas = [...new Set(dados.map(d => d.dataCriacao))].sort();
-            const recebidas = datas.map(dt => dados.filter(d => d.dataCriacao === dt).length);
-            const executadas = datas.map(dt => dados.filter(d => d.dataCriacao === dt && d.situacao === 'Executada em Campo').length);
+            // Agrupar datas por ISO para ordenar cronologicamente
+            const mapaDatas = {};
+            dados.forEach(d => {
+                if (d.dataIso) {
+                    if (!mapaDatas[d.dataIso]) {
+                        mapaDatas[d.dataIso] = { dataBr: d.dataBr, recebidas: 0, executadas: 0 };
+                    }
+                    mapaDatas[d.dataIso].recebidas++;
+                    if (d.situacao === 'Executada em Campo') {
+                        mapaDatas[d.dataIso].executadas++;
+                    }
+                }
+            });
+
+            const chavesIso = Object.keys(mapaDatas).sort();
+            const labelsBr = chavesIso.map(k => mapaDatas[k].dataBr);
+            const recebidas = chavesIso.map(k => mapaDatas[k].recebidas);
+            const executadas = chavesIso.map(k => mapaDatas[k].executadas);
+
+            // Calcular Saldo Acumulado cronologicamente
+            let acumuladoRecebidas = 0;
+            let acumuladoExecutadas = 0;
+            const saldoAcumulado = chavesIso.map(k => {
+                acumuladoRecebidas += mapaDatas[k].recebidas;
+                acumuladoExecutadas += mapaDatas[k].executadas;
+                return acumuladoRecebidas - acumuladoExecutadas;
+            });
 
             const canvas = document.getElementById('chartEvolucao');
             if (!canvas) return;
@@ -565,12 +601,35 @@
             if (chartEvolucaoObj) chartEvolucaoObj.destroy();
 
             chartEvolucaoObj = new Chart(ctx, {
-                type: 'bar',
                 data: {
-                    labels: datas,
+                    labels: labelsBr,
                     datasets: [
-                        { label: 'Demandas Recebidas', data: recebidas, backgroundColor: '#0284c7', borderRadius: 6 },
-                        { label: 'Executadas', data: executadas, backgroundColor: '#10b981', borderRadius: 6 }
+                        {
+                            type: 'bar',
+                            label: 'Demandas Recebidas',
+                            data: recebidas,
+                            backgroundColor: '#0284c7',
+                            borderRadius: 6
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Executadas',
+                            data: executadas,
+                            backgroundColor: '#10b981',
+                            borderRadius: 6
+                        },
+                        {
+                            type: 'line',
+                            label: 'Saldo Acumulado',
+                            data: saldoAcumulado,
+                            borderColor: '#ef4444',
+                            backgroundColor: '#ef4444',
+                            borderWidth: 2,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#ef4444',
+                            fill: false,
+                            tension: 0.2
+                        }
                     ]
                 },
                 options: {
@@ -660,7 +719,7 @@
                         <td class="p-3 text-slate-600">${d.cidade}</td>
                         <td class="p-3 text-slate-600">${d.area}</td>
                         <td class="p-3 text-slate-600">${d.coordenador}</td>
-                        <td class="p-3 text-slate-600">${d.dataCriacao}</td>
+                        <td class="p-3 text-slate-600">${d.dataBr || d.dataCriacao}</td>
                         <td class="p-3"><span class="px-2.5 py-1 text-[10px] rounded-md font-bold ${badgeClass}">${d.situacao}</span></td>
                         <td class="p-3 font-semibold text-slate-700">${d.responsavel}</td>
                         <td class="p-3 text-slate-500">${d.detalhes}</td>
@@ -680,7 +739,7 @@
         function exportarCSV() {
             let csv = 'Site,OS,Cidade,Area,Coordenador,DataCriacao,Situacao,Responsavel,Detalhes\n';
             dadosGlobais.forEach(d => {
-                csv += `"${d.site}","${d.os}","${d.cidade}","${d.area}","${d.coordenador}","${d.dataCriacao}","${d.situacao}","${d.responsavel}","${d.detalhes}"\n`;
+                csv += `"${d.site}","${d.os}","${d.cidade}","${d.area}","${d.coordenador}","${d.dataBr || d.dataCriacao}","${d.situacao}","${d.responsavel}","${d.detalhes}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const link = document.createElement('a');
