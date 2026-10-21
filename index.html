@@ -105,7 +105,7 @@
         </div>
     </section>
 
-    <!-- CARDS DE KPIS COM VALORES FINANCEIROS EMBUTIDOS -->
+    <!-- CARDS DE KPIS COM VALORES FINANCEIROS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         
         <!-- Total Demandas -->
@@ -169,7 +169,7 @@
             </div>
         </div>
 
-        <!-- Card de Indicadores Financeiros Consolidados -->
+        <!-- Indicadores Financeiros Consolidados -->
         <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between border-l-4 border-l-sky-500">
             <div class="flex justify-between items-center border-b border-slate-100 pb-1">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600 flex items-center">
@@ -192,7 +192,7 @@
 
     </section>
 
-    <!-- PAINEL DE FILTROS (COM MÚLTIPLA SELEÇÃO DE MESES) -->
+    <!-- PAINEL DE FILTROS -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -212,7 +212,6 @@
                 </select>
             </div>
             
-            <!-- Seleção Múltipla de Meses -->
             <div class="relative">
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
                     Mês <span class="text-[9px] font-normal text-slate-400">(Multi-seleção)</span>
@@ -260,7 +259,7 @@
         </div>
     </section>
 
-    <!-- GRÁFICOS GERENCIAIS -->
+    <!-- GRÁFICOS GERENCIAIS (POSICIONADOS LOGO ABAIXO DOS FILTROS) -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div class="lg:col-span-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Demanda x Execução por Dia (com Saldo Acumulado)</h3>
@@ -268,28 +267,29 @@
                 <canvas id="chartEvolucao"></canvas>
             </div>
         </div>
+        <!-- Gráfico Barras Horizontais de Pendências (Ordenado e Destaque no Maior) -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Distribuição das Pendências</h3>
-            <div class="h-64 flex items-center justify-center">
+            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Distribuição das Pendências (Maior Motivo em Destaque)</h3>
+            <div class="h-64">
                 <canvas id="chartMotivos"></canvas>
             </div>
         </div>
     </div>
 
-    <!-- TABELA CONSOLIDADA POR ÁREA -->
+    <!-- TABELA CONSOLIDADA POR ÁREA (VALORES CENTRALIZADOS) -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
         <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">Consolidado por Área Operacional</h3>
         <div class="overflow-x-auto">
             <table class="w-full text-xs text-left text-slate-600">
                 <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
                     <tr>
-                        <th class="p-3">Área</th>
-                        <th class="p-3">Recebidas</th>
-                        <th class="p-3">Executadas</th>
-                        <th class="p-3">Pendentes</th>
-                        <th class="p-3">Agendamento Vivo</th>
-                        <th class="p-3">Rede / Externa</th>
-                        <th class="p-3">Script / Ilha</th>
+                        <th class="p-3 text-left">Área</th>
+                        <th class="p-3 text-center">Recebidas</th>
+                        <th class="p-3 text-center">Executadas</th>
+                        <th class="p-3 text-center">Pendentes</th>
+                        <th class="p-3 text-center">Agendamento Vivo</th>
+                        <th class="p-3 text-center">Rede / Externa</th>
+                        <th class="p-3 text-center">Script / Ilha</th>
                     </tr>
                 </thead>
                 <tbody id="tbody-area" class="divide-y divide-slate-100"></tbody>
@@ -297,7 +297,7 @@
         </div>
     </section>
 
-    <!-- TABELA DETALHADA -->
+    <!-- TABELA DETALHADA (REAJUSTADA COM PREVISÃO DE EXECUÇÃO E SEM ENCAVALAR) -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Detalhamento Operacional das Demandas</h3>
@@ -306,19 +306,19 @@
                 <input type="text" id="busca-tabela" onkeyup="filtrarTabela()" placeholder="Buscar por Site, OS, Cidade..." class="text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl pl-8 pr-3 py-2 w-full focus:border-sky-500 focus:bg-white outline-none">
             </div>
         </div>
-        <div class="overflow-x-auto max-h-96">
-            <table class="w-full text-xs text-left text-slate-600">
-                <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 sticky top-0">
+        <div class="overflow-x-auto max-h-96 border border-slate-100 rounded-xl">
+            <table class="w-full text-xs text-left text-slate-600 min-w-[1000px]">
+                <thead class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200 sticky top-0 z-10">
                     <tr>
-                        <th class="p-3">Site</th>
-                        <th class="p-3">OS PRISMA</th>
-                        <th class="p-3">Cidade</th>
-                        <th class="p-3">Área</th>
-                        <th class="p-3">Coordenador</th>
-                        <th class="p-3">Criação</th>
-                        <th class="p-3">Situação</th>
-                        <th class="p-3">Responsável</th>
-                        <th class="p-3">Detalhes / Pendência</th>
+                        <th class="py-3 px-4">Site</th>
+                        <th class="py-3 px-4">OS PRISMA</th>
+                        <th class="py-3 px-4">Cidade</th>
+                        <th class="py-3 px-4">Área</th>
+                        <th class="py-3 px-4">Coordenador</th>
+                        <th class="py-3 px-4">Criação</th>
+                        <th class="py-3 px-4">Previsão Execução</th>
+                        <th class="py-3 px-4">Situação</th>
+                        <th class="py-3 px-4">Detalhes / Pendência</th>
                     </tr>
                 </thead>
                 <tbody id="tbody-detalhes" class="divide-y divide-slate-100"></tbody>
@@ -381,6 +381,18 @@
             }
         }
 
+        function formatarDataBr(str) {
+            if (!str) return '';
+            const partes = str.split('/');
+            if (partes.length === 3) {
+                const p1 = partes[0].padStart(2, '0');
+                const p2 = partes[1].padStart(2, '0');
+                const p3 = partes[2].length === 2 ? '20' + partes[2] : partes[2];
+                return `${p2}/${p1}/${p3}`;
+            }
+            return str;
+        }
+
         function processarResultados(rawRows) {
             dadosGlobais = rawRows.map(item => {
                 const getVal = (chave) => {
@@ -389,6 +401,8 @@
                 };
 
                 const dataCriacaoStr = getVal('Data Criação');
+                const previsaoStr = getVal('Previsão de execução');
+
                 let ano = '';
                 let mes = '';
                 let dataFormatadaBr = dataCriacaoStr;
@@ -419,6 +433,7 @@
                     dataCriacao: dataCriacaoStr,
                     dataBr: dataFormatadaBr,
                     dataIso: dataIso,
+                    previsaoExecucao: formatarDataBr(previsaoStr),
                     ano: ano,
                     mes: mes,
                     situacao: getVal('Situação Atividade'),
@@ -577,7 +592,6 @@
             if (document.getElementById('kpi-vivo')) document.getElementById('kpi-vivo').innerText = vivo;
             if (document.getElementById('pct-vivo')) document.getElementById('pct-vivo').innerText = `${pctVivo}% do total`;
 
-            // Cálculos Financeiros por Card
             let totalBaremo = 0;
             let totalPrisma = 0;
 
@@ -611,7 +625,6 @@
                 }
             });
 
-            // Preenchimento dos Valores nos Cards
             if (document.getElementById('fin-total-baremo')) document.getElementById('fin-total-baremo').innerText = `Baremo: ${formatMoeda(totalBaremo)}`;
             if (document.getElementById('fin-total-prisma')) document.getElementById('fin-total-prisma').innerText = `Prisma: ${formatMoeda(totalPrisma)}`;
 
@@ -738,10 +751,27 @@
 
         function atualizarGraficoMotivos(dados) {
             const motivos = {};
+            let totalPendencias = 0;
+
             dados.forEach(d => {
                 const m = d.resumoPendencias || 'Sem Pendência';
                 motivos[m] = (motivos[m] || 0) + 1;
+                totalPendencias++;
             });
+
+            // Ordenar da maior ocorrência para a menor
+            const ordenados = Object.keys(motivos)
+                .map(key => ({ motivo: key, qtd: motivos[key] }))
+                .sort((a, b) => b.qtd - a.qtd);
+
+            const labels = ordenados.map(o => {
+                const pct = totalPendencias > 0 ? ((o.qtd / totalPendencias) * 100).toFixed(1) : 0;
+                return `${o.motivo} (${o.qtd} - ${pct}%)`;
+            });
+            const valores = ordenados.map(o => o.qtd);
+
+            // Destacar a maior quantidade em vermelho (#ef4444) e o restante em azul (#0284c7)
+            const bgColors = valores.map((v, i) => i === 0 ? '#ef4444' : '#0284c7');
 
             const canvas = document.getElementById('chartMotivos');
             if (!canvas) return;
@@ -749,18 +779,27 @@
             if (chartMotivosObj) chartMotivosObj.destroy();
 
             chartMotivosObj = new Chart(ctx, {
-                type: 'doughnut',
+                type: 'bar',
                 data: {
-                    labels: Object.keys(motivos),
+                    labels: labels,
                     datasets: [{
-                        data: Object.values(motivos),
-                        backgroundColor: ['#0284c7', '#f59e0b', '#ef4444', '#10b981', '#8b5cf6', '#ec4899']
+                        label: 'Quantidade',
+                        data: valores,
+                        backgroundColor: bgColors,
+                        borderRadius: 6
                     }]
                 },
                 options: {
+                    indexAxis: 'y',
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#475569' } } }
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { ticks: { color: '#64748b' }, grid: { color: '#f1f5f9' } },
+                        y: { ticks: { color: '#475569', font: { size: 10, weight: 'bold' } }, grid: { display: false } }
+                    }
                 }
             });
         }
@@ -786,13 +825,13 @@
                 const item = porArea[area];
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-bold text-slate-800">${area}</td>
-                        <td class="p-3 font-semibold text-slate-700">${item.recebidas}</td>
-                        <td class="p-3 text-emerald-600 font-bold">${item.executadas}</td>
-                        <td class="p-3 text-amber-600 font-bold">${item.pendentes}</td>
-                        <td class="p-3 text-slate-600">${item.agendamento}</td>
-                        <td class="p-3 text-slate-600">${item.rede}</td>
-                        <td class="p-3 text-slate-600">${item.script}</td>
+                        <td class="p-3 font-bold text-slate-800 text-left">${area}</td>
+                        <td class="p-3 font-semibold text-slate-700 text-center">${item.recebidas}</td>
+                        <td class="p-3 text-emerald-600 font-bold text-center">${item.executadas}</td>
+                        <td class="p-3 text-amber-600 font-bold text-center">${item.pendentes}</td>
+                        <td class="p-3 text-slate-600 text-center">${item.agendamento}</td>
+                        <td class="p-3 text-slate-600 text-center">${item.rede}</td>
+                        <td class="p-3 text-slate-600 text-center">${item.script}</td>
                     </tr>
                 `;
             });
@@ -806,15 +845,15 @@
                 const badgeClass = d.situacao === 'Executada em Campo' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200';
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-bold text-sky-600">${d.site}</td>
-                        <td class="p-3 text-slate-700 font-medium">${d.os}</td>
-                        <td class="p-3 text-slate-600">${d.cidade}</td>
-                        <td class="p-3 text-slate-600">${d.area}</td>
-                        <td class="p-3 text-slate-600">${d.coordenador}</td>
-                        <td class="p-3 text-slate-600">${d.dataBr || d.dataCriacao}</td>
-                        <td class="p-3"><span class="px-2.5 py-1 text-[10px] rounded-md font-bold ${badgeClass}">${d.situacao}</span></td>
-                        <td class="p-3 font-semibold text-slate-700">${d.responsavel}</td>
-                        <td class="p-3 text-slate-500">${d.detalhes}</td>
+                        <td class="py-2.5 px-4 font-bold text-sky-600 whitespace-nowrap">${d.site}</td>
+                        <td class="py-2.5 px-4 text-slate-700 font-medium whitespace-nowrap">${d.os}</td>
+                        <td class="py-2.5 px-4 text-slate-600 whitespace-nowrap">${d.cidade}</td>
+                        <td class="py-2.5 px-4 text-slate-600 whitespace-nowrap">${d.area}</td>
+                        <td class="py-2.5 px-4 text-slate-600 whitespace-nowrap">${d.coordenador}</td>
+                        <td class="py-2.5 px-4 text-slate-600 whitespace-nowrap">${d.dataBr || d.dataCriacao}</td>
+                        <td class="py-2.5 px-4 text-slate-600 whitespace-nowrap font-semibold">${d.previsaoExecucao || '-'}</td>
+                        <td class="py-2.5 px-4 whitespace-nowrap"><span class="px-2.5 py-1 text-[10px] rounded-md font-bold ${badgeClass}">${d.situacao}</span></td>
+                        <td class="py-2.5 px-4 text-slate-500">${d.detalhes}</td>
                     </tr>
                 `;
             });
@@ -829,9 +868,9 @@
         }
 
         function exportarCSV() {
-            let csv = 'Site,OS,Cidade,Area,Coordenador,DataCriacao,Situacao,Responsavel,Detalhes\n';
+            let csv = 'Site,OS,Cidade,Area,Coordenador,DataCriacao,PrevisãoExecucao,Situacao,Responsavel,Detalhes\n';
             dadosGlobais.forEach(d => {
-                csv += `"${d.site}","${d.os}","${d.cidade}","${d.area}","${d.coordenador}","${d.dataBr || d.dataCriacao}","${d.situacao}","${d.responsavel}","${d.detalhes}"\n`;
+                csv += `"${d.site}","${d.os}","${d.cidade}","${d.area}","${d.coordenador}","${d.dataBr || d.dataCriacao}","${d.previsaoExecucao}","${d.situacao}","${d.responsavel}","${d.detalhes}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv' });
             const link = document.createElement('a');
