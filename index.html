@@ -61,7 +61,7 @@
         </div>
     </header>
 
-    <!-- QUADRO DE INSIGHTS & DESTAQUES DA ANÁLISE (SUBIDO PARA O TOPO) -->
+    <!-- QUADRO DE INSIGHTS & DESTAQUES DA ANÁLISE -->
     <section class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <div class="flex items-center space-x-2">
@@ -73,7 +73,6 @@
                     <p class="text-[11px] text-slate-400">Resumo executivo gerado automaticamente conforme o período filtrado</p>
                 </div>
             </div>
-            <!-- Badge Diagnóstico no estilo roxo suave da Imagem 2 -->
             <span class="text-[10px] font-bold text-purple-700 bg-purple-50 border border-purple-100 px-3 py-1 rounded-full uppercase tracking-wider">
                 Diagnóstico em Tempo Real
             </span>
@@ -91,7 +90,7 @@
         </div>
     </section>
 
-    <!-- BARRA COMPACTA E ESTREITA DE NOTIFICAÇÃO DE SINCRONIZAÇÃO EM LINHA ÚNICA -->
+    <!-- BARRA COMPACTA DE SINCRONIZAÇÃO -->
     <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 flex items-center justify-between text-xs text-emerald-800">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
@@ -105,7 +104,7 @@
     <!-- CARDS DE KPIS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
         
-        <!-- 1. Total Demandas -->
+        <!-- Total Demandas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32">
             <div class="flex justify-between items-center text-slate-400">
                 <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
@@ -118,7 +117,7 @@
             </div>
         </div>
 
-        <!-- 2. Executadas -->
+        <!-- Executadas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-emerald-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
@@ -133,7 +132,7 @@
             </div>
         </div>
 
-        <!-- 3. Pendentes -->
+        <!-- Pendentes -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-amber-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
@@ -148,7 +147,7 @@
             </div>
         </div>
 
-        <!-- 4. Impedimento VIVO -->
+        <!-- Impedimento VIVO -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-purple-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Imped. VIVO</span>
@@ -165,7 +164,7 @@
 
     </section>
 
-    <!-- PAINEL DE FILTROS -->
+    <!-- PAINEL DE FILTROS COM NOVO FILTRO PROGRAMADO (COLUNA U) -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -177,7 +176,7 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+        <div class="grid grid-cols-2 md:grid-cols-7 gap-3">
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Ano</label>
                 <select id="filtro-ano" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
@@ -232,6 +231,14 @@
                 </div>
             </div>
 
+            <!-- NOVO FILTRO PROGRAMADO (COLUNA U - PRIORIDADE VIVO) -->
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Programado</label>
+                <select id="filtro-programado" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
+                    <option value="">Todos os Status</option>
+                </select>
+            </div>
+
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Área Operacional</label>
                 <select id="filtro-area" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
@@ -275,7 +282,7 @@
         </div>
     </div>
 
-    <!-- CONSOLIDADO POR ÁREA COM ESTILO ROXO SUAVE DA IMAGEM 2 -->
+    <!-- CONSOLIDADO POR ÁREA -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <section class="lg:col-span-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">CONSOLIDADO POR ÁREA OPERACIONAL</h3>
@@ -287,7 +294,6 @@
                             <th class="p-2.5 text-center">Recebidas</th>
                             <th class="p-2.5 text-center">Executadas</th>
                             <th class="p-2.5 text-center">Pendentes</th>
-                            <!-- Colunas do Impedimento VIVO estilizadas com roxo suave -->
                             <th class="p-2.5 text-center bg-purple-50 text-purple-700 font-extrabold rounded-tl-lg">IMPED. VIVO</th>
                             <th class="p-2.5 text-center bg-purple-50/70 text-purple-700">AGENDAMENTO</th>
                             <th class="p-2.5 text-center bg-purple-50/70 text-purple-700">REDE / EXTERNA</th>
@@ -328,6 +334,7 @@
                         <th class="py-3 px-4">Criação</th>
                         <th class="py-3 px-4">Previsão Execução</th>
                         <th class="py-3 px-4">Situação</th>
+                        <th class="py-3 px-4">Programado (Vivo)</th>
                         <th class="py-3 px-4">Detalhes / Pendência</th>
                     </tr>
                 </thead>
@@ -441,6 +448,7 @@
 
                 const dataCriacaoStr = getVal('Data Criação');
                 const previsaoStr = getVal('Previsão de execução');
+                const programadoVivoStr = getVal('Prioridade Vivo'); // Coluna U
 
                 let ano = '';
                 let mes = '';
@@ -473,6 +481,7 @@
                     dataBr: dataFormatadaBr,
                     dataIso: dataIso,
                     previsaoExecucao: formatarDataBr(previsaoStr),
+                    programadoVivo: programadoVivoStr,
                     ano: ano,
                     mes: mes,
                     situacao: getVal('Situação Atividade'),
@@ -536,12 +545,14 @@
 
         function popularFiltros(dados) {
             const anos = [...new Set(dados.map(d => d.ano).filter(a => a !== ''))].sort().reverse();
+            const programados = [...new Set(dados.map(d => d.programadoVivo).filter(p => p !== ''))].sort();
             const areas = [...new Set(dados.map(d => d.area))].sort();
             const coords = [...new Set(dados.map(d => d.coordenador))].sort();
             const situacoes = [...new Set(dados.map(d => d.situacao))].sort();
             const responsaveis = [...new Set(dados.map(d => d.responsavel))].sort();
 
             preencherSelect('filtro-ano', anos);
+            preencherSelect('filtro-programado', programados);
             preencherSelect('filtro-area', areas);
             preencherSelect('filtro-coordenador', coords);
             preencherSelect('filtro-situacao', situacoes);
@@ -564,6 +575,7 @@
             document.querySelectorAll('.chk-mes').forEach(c => c.checked = false);
             atualizarSelecaoMeses();
 
+            document.getElementById('filtro-programado').value = '';
             document.getElementById('filtro-area').value = '';
             document.getElementById('filtro-coordenador').value = '';
             document.getElementById('filtro-situacao').value = '';
@@ -576,6 +588,7 @@
             const ano = document.getElementById('filtro-ano')?.value || '';
             const chksMeses = Array.from(document.querySelectorAll('.chk-mes:checked')).map(c => c.value);
 
+            const programado = document.getElementById('filtro-programado')?.value || '';
             const area = document.getElementById('filtro-area')?.value || '';
             const coord = document.getElementById('filtro-coordenador')?.value || '';
             const situacao = document.getElementById('filtro-situacao')?.value || '';
@@ -584,12 +597,13 @@
             const filtrados = dadosGlobais.filter(d => {
                 const matchAno = !ano || d.ano === ano;
                 const matchMes = chksMeses.length === 0 || chksMeses.includes(d.mes);
+                const matchProgramado = !programado || d.programadoVivo === programado;
                 const matchArea = !area || d.area === area;
                 const matchCoord = !coord || d.coordenador === coord;
                 const matchSituacao = !situacao || d.situacao === situacao;
                 const matchResp = !resp || d.responsavel === resp;
 
-                return matchAno && matchMes && matchArea && matchCoord && matchSituacao && matchResp;
+                return matchAno && matchMes && matchProgramado && matchArea && matchCoord && matchSituacao && matchResp;
             });
 
             atualizarKPIsEFinanceiro(filtrados);
@@ -872,7 +886,6 @@
                     totalPendentes++;
                 }
 
-                // Detalhamento dos motivos do Impedimento VIVO
                 if (d.responsavel === 'VIVO') {
                     porArea[d.area].vivo++;
                     if (d.resumoPendencias.includes('Agendamento')) porArea[d.area].vivoAgendamento++;
@@ -881,7 +894,6 @@
                 }
             });
 
-            // Tabela Consolidado por Área com destaque roxo no Impedimento VIVO e seus motivos
             const tbody = document.getElementById('tbody-area');
             if (tbody) {
                 tbody.innerHTML = '';
@@ -904,7 +916,6 @@
                 });
             }
 
-            // Gráfico Situação da Atividade
             const canvasSituacao = document.getElementById('chartSituacao');
             if (canvasSituacao) {
                 const ctx = canvasSituacao.getContext('2d');
@@ -958,6 +969,7 @@
                         <td class="py-2.5 px-4 text-slate-600 whitespace-nowrap">${d.dataBr || d.dataCriacao}</td>
                         <td class="py-2.5 px-4 text-slate-600 whitespace-nowrap font-semibold">${d.previsaoExecucao || '-'}</td>
                         <td class="py-2.5 px-4 whitespace-nowrap"><span class="px-2.5 py-1 text-[10px] rounded-md font-bold ${badgeClass}">${d.situacao}</span></td>
+                        <td class="py-2.5 px-4 text-slate-700 whitespace-nowrap font-medium">${d.programadoVivo || '-'}</td>
                         <td class="py-2.5 px-4 text-slate-500">${d.detalhes}</td>
                     </tr>
                 `;
@@ -972,12 +984,17 @@
             });
         }
 
+        // Função de Exportação CSV corrigida com BOM UTF-8 (\uFEFF)
         function exportarCSV() {
-            let csv = 'Site,OS,Cidade,Area,Coordenador,DataCriacao,PrevisãoExecucao,Situacao,Responsavel,Detalhes\n';
+            let csv = '\uFEFF'; // Adiciona BOM para forçar codificação correta no Excel
+            csv += 'Site,OS PRISMA,Cidade,Área,Coordenador TEL,Data Criação,Previsão Execução,Situação,Programado Vivo,Responsável,Detalhes\n';
+            
             dadosGlobais.forEach(d => {
-                csv += `"${d.site}","${d.os}","${d.cidade}","${d.area}","${d.coordenador}","${d.dataBr || d.dataCriacao}","${d.previsaoExecucao}","${d.situacao}","${d.responsavel}","${d.detalhes}"\n`;
+                const tratar = (txt) => `"${String(txt || '').replace(/"/g, '""')}"`;
+                csv += `${tratar(d.site)},${tratar(d.os)},${tratar(d.cidade)},${tratar(d.area)},${tratar(d.coordenador)},${tratar(d.dataBr || d.dataCriacao)},${tratar(d.previsaoExecucao)},${tratar(d.situacao)},${tratar(d.programadoVivo)},${tratar(d.responsavel)},${tratar(d.detalhes)}\n`;
             });
-            const blob = new Blob([csv], { type: 'text/csv' });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
             link.download = 'Controle_HL5_Export.csv';
