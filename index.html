@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Datalabels Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
     <!-- PapaParse para CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <!-- FontAwesome Icons -->
@@ -61,7 +63,7 @@
         </div>
     </header>
 
-    <!-- BARRA COMPACTA DE SINCRONIZAÇÃO (ACIMA DO QUADRO DE INSIGHTS) -->
+    <!-- BARRA COMPACTA DE SINCRONIZAÇÃO -->
     <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 flex items-center justify-between text-xs text-emerald-800">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
@@ -304,9 +306,10 @@
             </div>
         </section>
 
+        <!-- SITUAÇÃO DA ATIVIDADE REORGANIZADO IDENTICO À FOTO -->
         <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">SITUAÇÃO DA ATIVIDADE</h3>
-            <div class="h-56 flex items-center justify-center">
+            <div class="h-64 flex items-center justify-center relative p-2">
                 <canvas id="chartSituacao"></canvas>
             </div>
         </section>
@@ -343,6 +346,9 @@
     </section>
 
     <script>
+        // Registrar plugin de datalabels do Chart.js
+        Chart.register(ChartDataLabels);
+
         const CSV_ORIGINAL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSal4I1LQGFkVZipyOLlY_OMR4LFLofU-dOSHZprenGm0aBMcxuEDNnnHkI5jfeuj7WTNwuVrs1zp65/pub?gid=1085677200&single=true&output=csv';
         const PROXY_RAPIDO = 'https://corsproxy.io/?';
         const PROXY_BACKUP = 'https://api.allorigins.win/raw?url=';
@@ -675,7 +681,6 @@
             const insExec = document.getElementById('insight-execucao');
             if (insExec) insExec.innerHTML = `Atualmente <strong>${pct}%</strong> das demandas (${executadas} de ${total}) foram executadas no período.`;
 
-            // Considera estritamente as pendentes
             const pendentes = dados.filter(d => d.situacao !== 'Executada em Campo');
             const motivos = {};
             pendentes.forEach(d => {
@@ -762,7 +767,10 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { labels: { color: '#475569' } } },
+                    plugins: { 
+                        legend: { labels: { color: '#475569' } },
+                        datalabels: { display: false }
+                    },
                     scales: {
                         x: { ticks: { color: '#64748b' }, grid: { display: false } },
                         y: { ticks: { color: '#64748b' }, grid: { color: '#f1f5f9' } }
@@ -794,7 +802,6 @@
             }
         };
 
-        // Gráfico de Distribuição das Pendências estritamente sobre as Pendentes
         function atualizarGraficoMotivos(dados) {
             const pendentes = dados.filter(d => d.situacao !== 'Executada em Campo');
             const motivos = {};
@@ -846,6 +853,7 @@
                     },
                     plugins: {
                         legend: { display: false },
+                        datalabels: { display: false },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
@@ -863,7 +871,7 @@
             });
         }
 
-        // Tabela Consolidado por Área e Gráfico Situação da Atividade lendo a Coluna N (Situação Atividade)
+        // Gráfico Situação da Atividade Reorganizado Identico à Foto
         function atualizarTabelaAreaEChartSituacao(dados) {
             const porArea = {};
             const situacaoContagem = {};
@@ -882,7 +890,6 @@
                 }
                 porArea[d.area].recebidas++;
 
-                // Mapeamento da Coluna N (Situação Atividade)
                 const sitNome = d.situacao || 'Não Informado';
                 situacaoContagem[sitNome] = (situacaoContagem[sitNome] || 0) + 1;
 
@@ -920,29 +927,32 @@
                 });
             }
 
-            // Renderização do Gráfico Situação da Atividade lendo a Coluna N
+            // Gráfico Situação da Atividade idêntico à Imagem 26
             const canvasSituacao = document.getElementById('chartSituacao');
             if (canvasSituacao) {
                 const ctx = canvasSituacao.getContext('2d');
                 if (chartSituacaoObj) chartSituacaoObj.destroy();
 
                 const totalGeral = dados.length;
-                const labelsSituacao = Object.keys(situacaoContagem).map(k => {
-                    const val = situacaoContagem[k];
-                    const pct = totalGeral > 0 ? ((val / totalGeral) * 100).toFixed(1) : 0;
-                    return `${k} (${val} - ${pct}%)`;
-                });
+                
+                // Mapeamento de cores padronizadas conforme foto da requisição
+                const colorMap = {
+                    'Pendente Execução': '#10b981',  // Verde
+                    'Executada em Campo': '#f59e0b', // Amarelo/Laranja
+                    'Pendencia Vivo': '#8b5cf6'      // Roxo
+                };
 
-                const valoresSituacao = Object.values(situacaoContagem);
-                const cores = ['#10b981', '#f59e0b', '#8b5cf6', '#0284c7', '#ef4444', '#ec4899'];
+                const labels = Object.keys(situacaoContagem);
+                const dataValues = Object.values(situacaoContagem);
+                const bgColors = labels.map(l => colorMap[l] || '#0284c7');
 
                 chartSituacaoObj = new Chart(ctx, {
                     type: 'doughnut',
                     data: {
-                        labels: labelsSituacao,
+                        labels: labels,
                         datasets: [{
-                            data: valoresSituacao,
-                            backgroundColor: cores.slice(0, valoresSituacao.length),
+                            data: dataValues,
+                            backgroundColor: bgColors,
                             borderWidth: 2,
                             borderColor: '#ffffff'
                         }]
@@ -950,10 +960,29 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        layout: {
+                            padding: 30
+                        },
                         plugins: {
                             legend: {
-                                position: 'bottom',
-                                labels: { color: '#475569', font: { size: 10, weight: 'bold' } }
+                                display: false // Desabilita legenda padrão para exibir rótulos flutuantes com datalabels
+                            },
+                            datalabels: {
+                                color: '#475569',
+                                font: {
+                                    size: 10,
+                                    weight: 'bold',
+                                    family: 'Inter, sans-serif'
+                                },
+                                textAlign: 'center',
+                                anchor: 'end',
+                                align: 'end',
+                                offset: 8,
+                                formatter: function(value, context) {
+                                    const label = context.chart.data.labels[context.dataIndex];
+                                    const pct = totalGeral > 0 ? ((value / totalGeral) * 100).toFixed(1) : '0';
+                                    return `${label}\n(${value} - ${pct}%)`;
+                                }
                             }
                         }
                     }
