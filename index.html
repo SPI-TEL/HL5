@@ -105,7 +105,7 @@
         </div>
     </section>
 
-    <!-- CARDS DE KPIS EXATAMENTE COMO NO MODELO DA IMAGEM -->
+    <!-- CARDS DE KPIS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
         
         <!-- 1. Total Demandas -->
@@ -151,7 +151,7 @@
             </div>
         </div>
 
-        <!-- 4. Impedimento VIVO (Cor Roxa) -->
+        <!-- 4. Impedimento VIVO -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-purple-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Imped. VIVO</span>
@@ -168,7 +168,7 @@
 
     </section>
 
-    <!-- PAINEL DE FILTROS COM DROPDOWN MULTI-CHECKBOX DE MESES -->
+    <!-- PAINEL DE FILTROS -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -188,7 +188,6 @@
                 </select>
             </div>
             
-            <!-- Mês com Dropdown de Checkboxes -->
             <div class="relative">
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Mês</label>
                 <button type="button" onclick="toggleDropdownMes()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 flex justify-between items-center focus:border-sky-500 outline-none">
@@ -196,7 +195,6 @@
                     <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
                 </button>
                 
-                <!-- Dropdown flutuante com Checkboxes -->
                 <div id="dropdown-meses" class="hidden absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-xl shadow-xl z-30 p-2 max-h-56 overflow-y-auto space-y-1">
                     <label class="flex items-center space-x-2 text-xs text-slate-700 p-1.5 hover:bg-slate-50 rounded cursor-pointer">
                         <input type="checkbox" value="01" class="chk-mes rounded text-sky-600" onchange="atualizarSelecaoMeses()"> <span>01 - Janeiro</span>
@@ -280,26 +278,38 @@
         </div>
     </div>
 
-    <!-- TABELA CONSOLIDADA POR ÁREA -->
-    <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-        <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">CONSOLIDADO POR ÁREA OPERACIONAL</h3>
-        <div class="overflow-x-auto">
-            <table class="w-full text-xs text-left text-slate-600">
-                <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
-                    <tr>
-                        <th class="p-3 text-left">Área</th>
-                        <th class="p-3 text-center">Recebidas</th>
-                        <th class="p-3 text-center">Executadas</th>
-                        <th class="p-3 text-center">Pendentes</th>
-                        <th class="p-3 text-center">Agendamento Vivo</th>
-                        <th class="p-3 text-center">Rede / Externa</th>
-                        <th class="p-3 text-center">Script / Ilha</th>
-                    </tr>
-                </thead>
-                <tbody id="tbody-area" class="divide-y divide-slate-100"></tbody>
-            </table>
-        </div>
-    </section>
+    <!-- SEÇÃO CONSOLIDADO POR ÁREA + GRÁFICO DE SITUAÇÃO DA ATIVIDADE LADO A LADO -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <!-- Tabela Consolidado por Área (Ocupa 2 colunas) -->
+        <section class="lg:col-span-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">CONSOLIDADO POR ÁREA OPERACIONAL</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left text-slate-600">
+                    <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
+                        <tr>
+                            <th class="p-2.5 text-left">Área</th>
+                            <th class="p-2.5 text-center">Recebidas</th>
+                            <th class="p-2.5 text-center">Executadas</th>
+                            <th class="p-2.5 text-center">Pendentes</th>
+                            <th class="p-2.5 text-center">Imped. VIVO</th>
+                            <th class="p-2.5 text-center">Agendamento</th>
+                            <th class="p-2.5 text-center">Rede / Externa</th>
+                            <th class="p-2.5 text-center">Script / Ilha</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-area" class="divide-y divide-slate-100"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Gráfico de Situação da Atividade (Ocupa 1 coluna ao lado) -->
+        <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">SITUAÇÃO DA ATIVIDADE</h3>
+            <div class="h-56 flex items-center justify-center">
+                <canvas id="chartSituacao"></canvas>
+            </div>
+        </section>
+    </div>
 
     <!-- TABELA DETALHADA -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
@@ -338,11 +348,11 @@
         let dadosGlobais = [];
         let chartEvolucaoObj = null;
         let chartMotivosObj = null;
+        let chartSituacaoObj = null;
         let primeiraCarga = true;
 
         document.addEventListener("DOMContentLoaded", carregarDados);
 
-        // Fechar dropdown de meses ao clicar fora
         document.addEventListener("click", (e) => {
             const container = document.getElementById("dropdown-meses");
             const btn = e.target.closest("button");
@@ -590,7 +600,7 @@
             atualizarInsights(filtrados);
             atualizarGraficoEvolucao(filtrados);
             atualizarGraficoMotivos(filtrados);
-            atualizarTabelaArea(filtrados);
+            atualizarTabelaAreaEChartSituacao(filtrados);
             atualizarTabelaDetalhes(filtrados);
         }
 
@@ -607,7 +617,7 @@
         function atualizarKPIsEFinanceiro(dados) {
             const total = dados.length;
             const executadas = dados.filter(d => d.situacao === 'Executada em Campo').length;
-            const pendentes = dados.filter(d => d.situacao === 'Pendente Execução').length;
+            const pendentes = total - executadas; // Pendentes = Recebida - Executada
             const vivo = dados.filter(d => d.responsavel === 'VIVO').length;
 
             const pctExec = total > 0 ? ((executadas / total) * 100).toFixed(1) : 0;
@@ -633,7 +643,7 @@
 
                 if (d.situacao === 'Executada em Campo') {
                     execPrisma += prisma;
-                } else if (d.situacao === 'Pendente Execução') {
+                } else {
                     pendPrisma += prisma;
                 }
 
@@ -757,7 +767,6 @@
             });
         }
 
-        // Plugin customizado para desenhar texto de Quantidade e % diretamente no Canvas na ponta de cada barra
         const pluginBarLabels = {
             id: 'barLabels',
             afterDatasetsDraw(chart) {
@@ -848,37 +857,92 @@
             });
         }
 
-        function atualizarTabelaArea(dados) {
+        function atualizarTabelaAreaEChartSituacao(dados) {
             const porArea = {};
+            let totalExecutadas = 0;
+            let totalPendentes = 0;
+
             dados.forEach(d => {
                 if (!porArea[d.area]) {
-                    porArea[d.area] = { recebidas: 0, executadas: 0, pendentes: 0, agendamento: 0, rede: 0, script: 0 };
+                    porArea[d.area] = { recebidas: 0, executadas: 0, pendentes: 0, vivo: 0, agendamento: 0, rede: 0, script: 0 };
                 }
                 porArea[d.area].recebidas++;
-                if (d.situacao === 'Executada em Campo') porArea[d.area].executadas++;
-                if (d.situacao === 'Pendente Execução') porArea[d.area].pendentes++;
+
+                if (d.situacao === 'Executada em Campo') {
+                    porArea[d.area].executadas++;
+                    totalExecutadas++;
+                } else {
+                    totalPendentes++;
+                }
+
+                if (d.responsavel === 'VIVO') {
+                    porArea[d.area].vivo++;
+                }
+
                 if (d.resumoPendencias.includes('Agendamento')) porArea[d.area].agendamento++;
                 if (d.resumoPendencias.includes('Rede')) porArea[d.area].rede++;
                 if (d.resumoPendencias.includes('SCRIPT') || d.resumoPendencias.includes('Ilha')) porArea[d.area].script++;
             });
 
+            // Tabela Consolidado por Área
             const tbody = document.getElementById('tbody-area');
-            if (!tbody) return;
-            tbody.innerHTML = '';
-            Object.keys(porArea).forEach(area => {
-                const item = porArea[area];
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-bold text-slate-800 text-left">${area}</td>
-                        <td class="p-3 font-semibold text-slate-700 text-center">${item.recebidas}</td>
-                        <td class="p-3 text-emerald-600 font-bold text-center">${item.executadas}</td>
-                        <td class="p-3 text-amber-600 font-bold text-center">${item.pendentes}</td>
-                        <td class="p-3 text-slate-600 text-center">${item.agendamento}</td>
-                        <td class="p-3 text-slate-600 text-center">${item.rede}</td>
-                        <td class="p-3 text-slate-600 text-center">${item.script}</td>
-                    </tr>
-                `;
-            });
+            if (tbody) {
+                tbody.innerHTML = '';
+                Object.keys(porArea).forEach(area => {
+                    const item = porArea[area];
+                    const pendenteCalculado = item.recebidas - item.executadas; // Pendente = Recebida - Executada
+
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="p-2.5 font-bold text-slate-800 text-left">${area}</td>
+                            <td class="p-2.5 font-semibold text-slate-700 text-center">${item.recebidas}</td>
+                            <td class="p-2.5 text-emerald-600 font-bold text-center">${item.executadas}</td>
+                            <td class="p-2.5 text-amber-600 font-bold text-center">${pendenteCalculado}</td>
+                            <td class="p-2.5 text-purple-600 font-bold text-center">${item.vivo}</td>
+                            <td class="p-2.5 text-slate-600 text-center">${item.agendamento}</td>
+                            <td class="p-2.5 text-slate-600 text-center">${item.rede}</td>
+                            <td class="p-2.5 text-slate-600 text-center">${item.script}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            // Gráfico Situação da Atividade
+            const canvasSituacao = document.getElementById('chartSituacao');
+            if (canvasSituacao) {
+                const ctx = canvasSituacao.getContext('2d');
+                if (chartSituacaoObj) chartSituacaoObj.destroy();
+
+                const totalGeral = totalExecutadas + totalPendentes;
+                const pctExec = totalGeral > 0 ? ((totalExecutadas / totalGeral) * 100).toFixed(1) : 0;
+                const pctPend = totalGeral > 0 ? ((totalPendentes / totalGeral) * 100).toFixed(1) : 0;
+
+                chartSituacaoObj = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: [
+                            `Executada em Campo (${totalExecutadas} - ${pctExec}%)`, 
+                            `Pendente Execução (${totalPendentes} - ${pctPend}%)`
+                        ],
+                        datasets: [{
+                            data: [totalExecutadas, totalPendentes],
+                            backgroundColor: ['#10b981', '#f59e0b'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: '#475569', font: { size: 10, weight: 'bold' } }
+                            }
+                        }
+                    }
+                });
+            }
         }
 
         function atualizarTabelaDetalhes(dados) {
