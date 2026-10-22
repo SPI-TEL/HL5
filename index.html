@@ -105,8 +105,6 @@
 
     <!-- CARDS DE KPIS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-        
-        <!-- 1. Total Demandas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32">
             <div class="flex justify-between items-center text-slate-400">
                 <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
@@ -119,7 +117,6 @@
             </div>
         </div>
 
-        <!-- 2. Programados -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-sky-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600">Programados</span>
@@ -134,7 +131,6 @@
             </div>
         </div>
 
-        <!-- 3. Executadas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-emerald-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
@@ -149,7 +145,6 @@
             </div>
         </div>
 
-        <!-- 4. Pendentes -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-amber-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
@@ -164,7 +159,6 @@
             </div>
         </div>
 
-        <!-- 5. Impedimento VIVO -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-purple-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Imped. VIVO</span>
@@ -178,7 +172,6 @@
                 <p id="fin-vivo-prisma" class="text-sm font-black text-purple-700">R$ 0,00</p>
             </div>
         </div>
-
     </section>
 
     <!-- PAINEL DE FILTROS -->
@@ -545,7 +538,7 @@
                     ano: ano,
                     mes: mes,
                     situacao: getVal('Situação Atividade'),
-                    responsavel: getVal('Responsabilidade') || getVal('Responsavel'), // Analisa Coluna X
+                    responsavel: getVal('Responsabilidade') || getVal('Responsavel'), // Coluna X (Responsabilidade)
                     detalhes: getVal('Detalhes_Informações'),
                     resumoPendencias: getVal('Resumo Pendencias'),
                     reprogramacao: getVal('Reprogramação') || getVal('Reprogramacao') || '0',
@@ -686,39 +679,34 @@
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // Regras de cálculo atualizadas com base na Coluna U (Programação) e Coluna X (Responsabilidade)
+        // Regras de cálculo atualizadas
         function atualizarKPIsEFinanceiro(dados) {
-            // 1. Total Demandas: Soma Liberado Execução + Aguardando Agendamento / Aprovação + Concluido
-            const totalDemandasList = dados.filter(d => {
-                const u = (d.programadoVivo || '').trim().toLowerCase();
-                return u === 'liberado execução' || u === 'liberado execucao' || 
-                       u === 'aguardando agendamento' || u === 'aguardando aprovação' || u === 'aguardando aprovacao' ||
-                       u === 'concluido' || u === 'concluído';
-            });
-            const total = totalDemandasList.length;
+            const total = dados.length;
 
-            // 2. Programados: Coluna U = Liberado Execução + Concluido
+            // 1. Programados: Coluna U = Liberado Execução + Concluido / Executada em Campo
             const programadosList = dados.filter(d => {
                 const u = (d.programadoVivo || '').trim().toLowerCase();
-                return u === 'liberado execução' || u === 'liberado execucao' || u === 'concluido' || u === 'concluído';
+                const sit = (d.situacao || '').trim().toLowerCase();
+                return u === 'liberado execução' || u === 'liberado execucao' || u === 'concluido' || u === 'concluído' || sit === 'executada em campo';
             });
             const programados = programadosList.length;
 
-            // 3. Executadas: Coluna U = Concluido
+            // 2. Executadas: Coluna U = Concluido OU Coluna N = Executada em Campo
             const executadasList = dados.filter(d => {
                 const u = (d.programadoVivo || '').trim().toLowerCase();
-                return u === 'concluido' || u === 'concluído';
+                const sit = (d.situacao || '').trim().toLowerCase();
+                return u === 'concluido' || u === 'concluído' || sit === 'executada em campo';
             });
             const executadas = executadasList.length;
 
-            // 4. Pendentes: Coluna U = Aguardando Agendamento + Liberado Execução
+            // 3. Pendentes: Coluna N != Executada em Campo
             const pendentesList = dados.filter(d => {
-                const u = (d.programadoVivo || '').trim().toLowerCase();
-                return u === 'aguardando agendamento' || u === 'aguardando aprovação' || u === 'aguardando aprovacao' || u === 'liberado execução' || u === 'liberado execucao';
+                const sit = (d.situacao || '').trim().toLowerCase();
+                return sit !== 'executada em campo';
             });
             const pendentes = pendentesList.length;
 
-            // 5. Impedimento VIVO: Analisa Coluna X (Responsabilidade) == 'VIVO'
+            // 4. Impedimento VIVO: Analisa Coluna X (Responsabilidade) == 'VIVO'
             const vivoList = dados.filter(d => (d.responsavel || '').trim().toUpperCase() === 'VIVO');
             const vivo = vivoList.length;
 
@@ -746,7 +734,7 @@
             let pendPrisma = 0;
             let vivoPrisma = 0;
 
-            totalDemandasList.forEach(d => totalPrisma += parseMoeda(d.valorPrisma));
+            dados.forEach(d => totalPrisma += parseMoeda(d.valorPrisma));
             programadosList.forEach(d => progPrisma += parseMoeda(d.valorPrisma));
             executadasList.forEach(d => execPrisma += parseMoeda(d.valorPrisma));
             pendentesList.forEach(d => pendPrisma += parseMoeda(d.valorPrisma));
@@ -761,19 +749,13 @@
 
         function atualizarInsights(dados) {
             const total = dados.length;
-            const executadas = dados.filter(d => {
-                const u = (d.programadoVivo || '').trim().toLowerCase();
-                return u === 'concluido' || u === 'concluído';
-            }).length;
+            const executadas = dados.filter(d => (d.situacao || '').trim().toLowerCase() === 'executada em campo').length;
             const pct = total > 0 ? ((executadas / total) * 100).toFixed(1) : 0;
 
             const insExec = document.getElementById('insight-execucao');
             if (insExec) insExec.innerHTML = `Atualmente <strong>${pct}%</strong> das demandas (${executadas} de ${total}) foram concluídas no período.`;
 
-            const pendentes = dados.filter(d => {
-                const u = (d.programadoVivo || '').trim().toLowerCase();
-                return u !== 'concluido' && u !== 'concluído';
-            });
+            const pendentes = dados.filter(d => (d.situacao || '').trim().toLowerCase() !== 'executada em campo');
             const motivos = {};
             pendentes.forEach(d => {
                 if (d.resumoPendencias) motivos[d.resumoPendencias] = (motivos[d.resumoPendencias] || 0) + 1;
@@ -792,6 +774,7 @@
             if (insGargalo) insGargalo.innerHTML = `O principal motivo pendente é <strong>"${maiorMotivo}"</strong> com ${maiorQtd} ocorrência(s).`;
         }
 
+        // Gráfico de evolução abrangendo TODOS os dias do mês selecionado
         function atualizarGraficoEvolucao(dados) {
             const mapaDatas = {};
             dados.forEach(d => {
@@ -800,14 +783,38 @@
                         mapaDatas[d.dataIso] = { dataBr: d.dataBr, recebidas: 0, executadas: 0 };
                     }
                     mapaDatas[d.dataIso].recebidas++;
-                    const u = (d.programadoVivo || '').trim().toLowerCase();
-                    if (u === 'concluido' || u === 'concluído') {
+                    if ((d.situacao || '').trim().toLowerCase() === 'executada em campo') {
                         mapaDatas[d.dataIso].executadas++;
                     }
                 }
             });
 
-            const chavesIso = Object.keys(mapaDatas).sort();
+            // Determinar o período contínuo do mês selecionado
+            let chavesIso = [];
+            const chksMeses = Array.from(document.querySelectorAll('.chk-mes:checked')).map(c => c.value);
+            const anoSel = document.getElementById('filtro-ano')?.value || new Date().getFullYear().toString();
+
+            if (chksMeses.length === 1) {
+                const mes = parseInt(chksMeses[0], 10);
+                const ano = parseInt(anoSel, 10);
+                const diasNoMes = new Date(ano, mes, 0).getDate();
+                
+                for (let dia = 1; dia <= diasNoMes; dia++) {
+                    const dStr = dia.toString().padStart(2, '0');
+                    const mStr = mes.toString().padStart(2, '0');
+                    const isoKey = `${ano}-${mStr}-${dStr}`;
+                    const brKey = `${dStr}/${mStr}/${ano}`;
+                    
+                    if (!mapaDatas[isoKey]) {
+                        mapaDatas[isoKey] = { dataBr: brKey, recebidas: 0, executadas: 0 };
+                    }
+                    chavesIso.push(isoKey);
+                }
+                chavesIso.sort();
+            } else {
+                chavesIso = Object.keys(mapaDatas).sort();
+            }
+
             const labelsBr = chavesIso.map(k => mapaDatas[k].dataBr);
             const recebidas = chavesIso.map(k => mapaDatas[k].recebidas);
             const executadas = chavesIso.map(k => mapaDatas[k].executadas);
@@ -896,10 +903,7 @@
         };
 
         function atualizarGraficoMotivos(dados) {
-            const pendentes = dados.filter(d => {
-                const u = (d.programadoVivo || '').trim().toLowerCase();
-                return u !== 'concluido' && u !== 'concluído';
-            });
+            const pendentes = dados.filter(d => (d.situacao || '').trim().toLowerCase() !== 'executada em campo');
             const motivos = {};
             let totalPendencias = 0;
 
@@ -988,12 +992,10 @@
                 const sitNome = d.situacao || 'Não Informado';
                 situacaoContagem[sitNome] = (situacaoContagem[sitNome] || 0) + 1;
 
-                const u = (d.programadoVivo || '').trim().toLowerCase();
-                if (u === 'concluido' || u === 'concluído') {
+                if ((d.situacao || '').trim().toLowerCase() === 'executada em campo') {
                     porArea[d.area].executadas++;
                 }
 
-                // Analisa Coluna X (Responsabilidade) == 'VIVO'
                 if ((d.responsavel || '').trim().toUpperCase() === 'VIVO') {
                     porArea[d.area].vivo++;
                     if (d.resumoPendencias.includes('Agendamento')) porArea[d.area].vivoAgendamento++;
