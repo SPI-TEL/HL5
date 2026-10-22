@@ -63,7 +63,7 @@
         </div>
     </header>
 
-    <!-- BARRA COMPACTA DE SINCRONIZAÇÃO (ACIMA DO QUADRO DE INSIGHTS) -->
+    <!-- BARRA COMPACTA DE SINCRONIZAÇÃO -->
     <div class="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-2 flex items-center justify-between text-xs text-emerald-800">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
@@ -103,10 +103,10 @@
         </div>
     </section>
 
-    <!-- CARDS DE KPIS -->
-    <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+    <!-- CARDS DE KPIS COM NOVO CARD "PROGRAMADOS" INSERIDO -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
         
-        <!-- Total Demandas -->
+        <!-- 1. Total Demandas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32">
             <div class="flex justify-between items-center text-slate-400">
                 <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
@@ -119,7 +119,22 @@
             </div>
         </div>
 
-        <!-- Executadas -->
+        <!-- 2. Programados (Novo Card inserido entre Total e Executadas) -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-sky-500">
+            <div class="flex justify-between items-center">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600">Programados</span>
+                <i class="fa-solid fa-calendar-check text-xs text-sky-500"></i>
+            </div>
+            <div class="flex items-baseline justify-between">
+                <p id="kpi-programados" class="text-3xl font-black text-sky-600">0</p>
+                <span id="pct-programados" class="text-[10px] bg-sky-50 text-sky-700 px-2 py-0.5 rounded-md font-bold">0% do total</span>
+            </div>
+            <div class="border-t border-slate-100 pt-2 text-right">
+                <p id="fin-prog-prisma" class="text-sm font-black text-sky-700">R$ 0,00</p>
+            </div>
+        </div>
+
+        <!-- 3. Executadas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-emerald-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
@@ -134,7 +149,7 @@
             </div>
         </div>
 
-        <!-- Pendentes -->
+        <!-- 4. Pendentes -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-amber-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
@@ -149,7 +164,7 @@
             </div>
         </div>
 
-        <!-- Impedimento VIVO -->
+        <!-- 5. Impedimento VIVO -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-purple-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Imped. VIVO</span>
@@ -233,6 +248,7 @@
                 </div>
             </div>
 
+            <!-- FILTRO PROGRAMAÇÃO (COLUNA U) -->
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Programado</label>
                 <select id="filtro-programado" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
@@ -259,7 +275,6 @@
                 </select>
             </div>
 
-            <!-- FILTRO RESPONSÁVEL PENDÊNCIA (COLUNA X) -->
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Responsável Pendência</label>
                 <select id="filtro-responsavel" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
@@ -316,7 +331,7 @@
         </section>
     </div>
 
-    <!-- TABELA DETALHADA COM COLUNA REPROGRAMAÇÃO (COLUNA Y) E BOTÃO VER OBSERVAÇÕES (COLUNA V) -->
+    <!-- TABELA DETALHADA -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider">DETALHAMENTO OPERACIONAL DAS DEMANDAS</h3>
@@ -337,7 +352,7 @@
                         <th class="py-3 px-4">Criação</th>
                         <th class="py-3 px-4">Previsão Execução</th>
                         <th class="py-3 px-4">Situação</th>
-                        <th class="py-3 px-4">Programado (Vivo)</th>
+                        <th class="py-3 px-4">Programação (Vivo)</th>
                         <th class="py-3 px-4 text-center">Reprogramações</th>
                         <th class="py-3 px-4 text-center">Observações</th>
                     </tr>
@@ -347,7 +362,7 @@
         </div>
     </section>
 
-    <!-- MODAL DE OBSERVAÇÕES (COLUNA V) -->
+    <!-- MODAL DE OBSERVAÇÕES -->
     <div id="modal-obs" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-lg w-full p-5 shadow-2xl border border-slate-100 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -487,7 +502,7 @@
 
                 const dataCriacaoStr = getVal('Data Criação');
                 const previsaoStr = getVal('Previsão de execução');
-                const programadoVivoStr = getVal('Prioridade Vivo');
+                const programadoVivoStr = getVal('Programação') || getVal('Prioridade Vivo'); // Coluna U
 
                 let ano = '';
                 let mes = '';
@@ -532,9 +547,9 @@
                     mes: mes,
                     situacao: getVal('Situação Atividade'),
                     responsavel: getVal('Responsavel'),
-                    detalhes: getVal('Detalhes_Informações'), // Coluna V (Observações)
-                    resumoPendencias: getVal('Resumo Pendencias'), // Coluna X (Responsável Pendência)
-                    reprogramacao: getVal('Resumo Pendencias') || getVal('Reprogramacao') || '0', // Coluna Y
+                    detalhes: getVal('Detalhes_Informações'),
+                    resumoPendencias: getVal('Resumo Pendencias'),
+                    reprogramacao: getVal('Resumo Pendencias') || getVal('Reprogramacao') || '0',
                     pontoBaremo: getVal('Ponto Baremo') || '0',
                     valorPrisma: getVal('Valor Prisma') || '0'
                 };
@@ -596,7 +611,7 @@
             const areas = [...new Set(dados.map(d => d.area))].sort();
             const coords = [...new Set(dados.map(d => d.coordenador))].sort();
             const situacoes = [...new Set(dados.map(d => d.situacao))].sort();
-            const responsaveisPend = [...new Set(dados.map(d => d.resumoPendencias).filter(r => r !== ''))].sort(); // Mapeia Coluna X
+            const responsaveisPend = [...new Set(dados.map(d => d.resumoPendencias).filter(r => r !== ''))].sort();
 
             preencherSelect('filtro-ano', anos);
             preencherSelect('filtro-programado', programados);
@@ -617,7 +632,6 @@
             select.value = valAtual;
         }
 
-        // Limpeza de filtros ultrarrápida
         function limparFiltros() {
             document.getElementById('filtro-ano').value = '';
             document.querySelectorAll('.chk-mes').forEach(c => c.checked = false);
@@ -641,7 +655,7 @@
             const area = document.getElementById('filtro-area')?.value || '';
             const coord = document.getElementById('filtro-coordenador')?.value || '';
             const situacao = document.getElementById('filtro-situacao')?.value || '';
-            const respPend = document.getElementById('filtro-responsavel')?.value || ''; // Coluna X
+            const respPend = document.getElementById('filtro-responsavel')?.value || '';
 
             const filtrados = dadosGlobais.filter(d => {
                 const matchAno = !ano || d.ano === ano;
@@ -673,25 +687,56 @@
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
+        // Atualização das regras de cálculo com base na Coluna U (Programação)
         function atualizarKPIsEFinanceiro(dados) {
             const total = dados.length;
-            const executadas = dados.filter(d => d.situacao === 'Executada em Campo').length;
-            const pendentes = total - executadas;
-            const vivo = dados.filter(d => d.responsavel === 'VIVO').length;
 
+            // 1. Programados: Coluna U = Liberado Execução + Concluido
+            const programadosList = dados.filter(d => {
+                const u = (d.programadoVivo || '').trim().toLowerCase();
+                return u === 'liberado execução' || u === 'liberado execucao' || u === 'concluido' || u === 'concluído';
+            });
+            const programados = programadosList.length;
+
+            // 2. Executadas: Coluna U = Concluido
+            const executadasList = dados.filter(d => {
+                const u = (d.programadoVivo || '').trim().toLowerCase();
+                return u === 'concluido' || u === 'concluído';
+            });
+            const executadas = executadasList.length;
+
+            // 3. Pendentes: Coluna U = Aguardando Agendamento + Liberado Execução
+            const pendentesList = dados.filter(d => {
+                const u = (d.programadoVivo || '').trim().toLowerCase();
+                return u === 'aguardando agendamento' || u === 'liberado execução' || u === 'liberado execucao';
+            });
+            const pendentes = pendentesList.length;
+
+            // 4. Impedimento VIVO
+            const vivoList = dados.filter(d => d.responsavel === 'VIVO');
+            const vivo = vivoList.length;
+
+            const pctProg = total > 0 ? ((programados / total) * 100).toFixed(1) : 0;
             const pctExec = total > 0 ? ((executadas / total) * 100).toFixed(1) : 0;
             const pctPend = total > 0 ? ((pendentes / total) * 100).toFixed(1) : 0;
             const pctVivo = total > 0 ? ((vivo / total) * 100).toFixed(1) : 0;
 
             if (document.getElementById('kpi-recebidas')) document.getElementById('kpi-recebidas').innerText = total;
+            if (document.getElementById('kpi-programados')) document.getElementById('kpi-programados').innerText = programados;
+            if (document.getElementById('pct-programados')) document.getElementById('pct-programados').innerText = `${pctProg}% do total`;
+            
             if (document.getElementById('kpi-executadas')) document.getElementById('kpi-executadas').innerText = executadas;
             if (document.getElementById('pct-executadas')) document.getElementById('pct-executadas').innerText = `${pctExec}% do total`;
+            
             if (document.getElementById('kpi-pendentes')) document.getElementById('kpi-pendentes').innerText = pendentes;
             if (document.getElementById('pct-pendentes')) document.getElementById('pct-pendentes').innerText = `${pctPend}% do total`;
+            
             if (document.getElementById('kpi-vivo')) document.getElementById('kpi-vivo').innerText = vivo;
             if (document.getElementById('pct-vivo')) document.getElementById('pct-vivo').innerText = `${pctVivo}% do total`;
 
+            // Valores Financeiros Prisma acumulados
             let totalPrisma = 0;
+            let progPrisma = 0;
             let execPrisma = 0;
             let pendPrisma = 0;
             let vivoPrisma = 0;
@@ -699,19 +744,15 @@
             dados.forEach(d => {
                 const prisma = parseMoeda(d.valorPrisma);
                 totalPrisma += prisma;
-
-                if (d.situacao === 'Executada em Campo') {
-                    execPrisma += prisma;
-                } else {
-                    pendPrisma += prisma;
-                }
-
-                if (d.responsavel === 'VIVO') {
-                    vivoPrisma += prisma;
-                }
             });
 
+            programadosList.forEach(d => progPrisma += parseMoeda(d.valorPrisma));
+            executadasList.forEach(d => execPrisma += parseMoeda(d.valorPrisma));
+            pendentesList.forEach(d => pendPrisma += parseMoeda(d.valorPrisma));
+            vivoList.forEach(d => vivoPrisma += parseMoeda(d.valorPrisma));
+
             if (document.getElementById('fin-total-prisma')) document.getElementById('fin-total-prisma').innerText = formatMoeda(totalPrisma);
+            if (document.getElementById('fin-prog-prisma')) document.getElementById('fin-prog-prisma').innerText = formatMoeda(progPrisma);
             if (document.getElementById('fin-exec-prisma')) document.getElementById('fin-exec-prisma').innerText = formatMoeda(execPrisma);
             if (document.getElementById('fin-pend-prisma')) document.getElementById('fin-pend-prisma').innerText = formatMoeda(pendPrisma);
             if (document.getElementById('fin-vivo-prisma')) document.getElementById('fin-vivo-prisma').innerText = formatMoeda(vivoPrisma);
@@ -719,13 +760,19 @@
 
         function atualizarInsights(dados) {
             const total = dados.length;
-            const executadas = dados.filter(d => d.situacao === 'Executada em Campo').length;
+            const executadas = dados.filter(d => {
+                const u = (d.programadoVivo || '').trim().toLowerCase();
+                return u === 'concluido' || u === 'concluído';
+            }).length;
             const pct = total > 0 ? ((executadas / total) * 100).toFixed(1) : 0;
 
             const insExec = document.getElementById('insight-execucao');
-            if (insExec) insExec.innerHTML = `Atualmente <strong>${pct}%</strong> das demandas (${executadas} de ${total}) foram executadas no período.`;
+            if (insExec) insExec.innerHTML = `Atualmente <strong>${pct}%</strong> das demandas (${executadas} de ${total}) foram concluídas no período.`;
 
-            const pendentes = dados.filter(d => d.situacao !== 'Executada em Campo');
+            const pendentes = dados.filter(d => {
+                const u = (d.programadoVivo || '').trim().toLowerCase();
+                return u !== 'concluido' && u !== 'concluído';
+            });
             const motivos = {};
             pendentes.forEach(d => {
                 if (d.resumoPendencias) motivos[d.resumoPendencias] = (motivos[d.resumoPendencias] || 0) + 1;
@@ -752,7 +799,8 @@
                         mapaDatas[d.dataIso] = { dataBr: d.dataBr, recebidas: 0, executadas: 0 };
                     }
                     mapaDatas[d.dataIso].recebidas++;
-                    if (d.situacao === 'Executada em Campo') {
+                    const u = (d.programadoVivo || '').trim().toLowerCase();
+                    if (u === 'concluido' || u === 'concluído') {
                         mapaDatas[d.dataIso].executadas++;
                     }
                 }
@@ -847,7 +895,10 @@
         };
 
         function atualizarGraficoMotivos(dados) {
-            const pendentes = dados.filter(d => d.situacao !== 'Executada em Campo');
+            const pendentes = dados.filter(d => {
+                const u = (d.programadoVivo || '').trim().toLowerCase();
+                return u !== 'concluido' && u !== 'concluído';
+            });
             const motivos = {};
             let totalPendencias = 0;
 
@@ -936,7 +987,8 @@
                 const sitNome = d.situacao || 'Não Informado';
                 situacaoContagem[sitNome] = (situacaoContagem[sitNome] || 0) + 1;
 
-                if (d.situacao === 'Executada em Campo') {
+                const u = (d.programadoVivo || '').trim().toLowerCase();
+                if (u === 'concluido' || u === 'concluído') {
                     porArea[d.area].executadas++;
                 }
 
@@ -1038,7 +1090,6 @@
             dados.forEach(d => {
                 const badgeClass = d.situacao === 'Executada em Campo' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200';
                 
-                // Trata o texto das observações para o modal
                 const obsTexto = (d.detalhes || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
                 tbody.innerHTML += `
@@ -1074,7 +1125,7 @@
 
         function exportarCSV() {
             let csv = '\uFEFF';
-            csv += 'Site,OS PRISMA,Cidade,Área,Coordenador TEL,Data Criação,Previsão Execução,Situação,Programado Vivo,Reprogramação,Responsável Pendência,Detalhes\n';
+            csv += 'Site,OS PRISMA,Cidade,Área,Coordenador TEL,Data Criação,Previsão Execução,Situação,Programação (Vivo),Reprogramação,Responsável Pendência,Detalhes\n';
             
             dadosGlobais.forEach(d => {
                 const tratar = (txt) => `"${String(txt || '').replace(/"/g, '""')}"`;
