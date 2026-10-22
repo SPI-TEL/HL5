@@ -46,7 +46,7 @@
                 <p id="hora-sincronizacao" class="text-sm font-bold text-white font-mono">--:--:--</p>
             </div>
 
-            <button onclick="carregarDados()" class="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition shadow-md">
+            <button onclick="carregarDados(true)" class="flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs px-4 py-2.5 rounded-xl transition shadow-md">
                 <i class="fa-solid fa-arrows-rotate"></i>
                 <span>Sincronizar</span>
             </button>
@@ -103,7 +103,7 @@
         </div>
     </section>
 
-    <!-- CARDS DE KPIS REGRAS ATUALIZADAS -->
+    <!-- CARDS DE KPIS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
         
         <!-- 1. Total Demandas -->
@@ -437,19 +437,23 @@
             document.getElementById('modal-obs').classList.add('hidden');
         }
 
-        async function carregarDados() {
+        async function carregarDados(forceRefresh = false) {
             setLoadingStatus(true, "Carregando dados...");
 
-            let csvText = await buscarCSVComTimeout(CSV_ORIGINAL);
+            // Adiciona timestamp para forçar a limpeza de cache no Google Sheets e Proxies
+            const cacheBuster = `&t=${new Date().getTime()}`;
+            const urlPlanilha = CSV_ORIGINAL + cacheBuster;
+
+            let csvText = await buscarCSVComTimeout(urlPlanilha);
 
             if (!csvText) {
                 setLoadingStatus(true, "Conectando via Proxy Rápido...");
-                csvText = await buscarCSVComTimeout(PROXY_RAPIDO + encodeURIComponent(CSV_ORIGINAL));
+                csvText = await buscarCSVComTimeout(PROXY_RAPIDO + encodeURIComponent(urlPlanilha));
             }
 
             if (!csvText) {
                 setLoadingStatus(true, "Conectando via Proxy Backup...");
-                csvText = await buscarCSVComTimeout(PROXY_BACKUP + encodeURIComponent(CSV_ORIGINAL));
+                csvText = await buscarCSVComTimeout(PROXY_BACKUP + encodeURIComponent(urlPlanilha));
             }
 
             if (csvText) {
@@ -470,7 +474,7 @@
             const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
             try {
-                const response = await fetch(url, { signal: controller.signal });
+                const response = await fetch(url, { signal: controller.signal, cache: 'no-store' });
                 clearTimeout(timeoutId);
                 if (response.ok) return await response.text();
                 return null;
@@ -499,7 +503,8 @@
                     return keyEncontrada ? item[keyEncontrada] : '';
                 };
 
-                const dataCriacaoStr = getVal('Data Criação'); // Extrai exclusivamente da Coluna J
+                // Extração exata da Coluna J (Data Criação)
+                const dataCriacaoStr = getVal('Data Criação');
                 const previsaoStr = getVal('Previsão de execução');
                 const programadoVivoStr = getVal('Programação') || getVal('Prioridade Vivo');
 
@@ -686,34 +691,29 @@
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // Regras estritas conforme orientações:
-        // Total Demandas = Total do mês filtrado (71)
-        // Programadas = Coluna N == 'Liberado Execução' (55)
-        // Executadas = Coluna N == 'Executada em Campo' (22)
-        // Pendentes = Total Demandas - Executadas (71 - 22 = 49)
-        // Impedimento VIVO = Coluna N == 'Pendente VIVO' ou 'Pendencia Vivo'
+        // Mapeamento dos Cards com base na Coluna N (Situação Atividade) e Regras Especificadas
         function atualizarKPIsEFinanceiro(dados) {
             const total = dados.length;
 
-            // Programados: Coluna N = Liberado Execução
+            // 1. Programadas (55): Coluna N == Liberado Execução
             const programadosList = dados.filter(d => {
                 const sit = (d.situacao || '').trim().toLowerCase();
                 return sit === 'liberado execução' || sit === 'liberado execucao';
             });
             const programados = programadosList.length;
 
-            // Executadas: Coluna N = Executada em Campo
+            // 2. Executadas (22): Coluna N == Executada em Campo
             const executadasList = dados.filter(d => {
                 const sit = (d.situacao || '').trim().toLowerCase();
                 return sit === 'executada em campo';
             });
             const executadas = executadasList.length;
 
-            // Pendentes = Total Demandas - Executadas
+            // 3. Pendentes (49): Total Demandas - Executadas
             const pendentes = total - executadas;
             const pendentesList = dados.filter(d => (d.situacao || '').trim().toLowerCase() !== 'executada em campo');
 
-            // Impedimento VIVO: Coluna N == Pendente VIVO / Pendencia Vivo
+            // 4. Impedimento VIVO: Coluna N == Pendencia Vivo / Pendente VIVO
             const vivoList = dados.filter(d => {
                 const sit = (d.situacao || '').trim().toLowerCase();
                 return sit === 'pendente vivo' || sit === 'pendencia vivo' || sit === 'pendência vivo';
