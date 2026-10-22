@@ -103,7 +103,7 @@
         </div>
     </section>
 
-    <!-- CARDS DE KPIS -->
+    <!-- CARDS DE KPIS REGRAS ATUALIZADAS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
         
         <!-- 1. Total Demandas -->
@@ -499,9 +499,9 @@
                     return keyEncontrada ? item[keyEncontrada] : '';
                 };
 
-                const dataCriacaoStr = getVal('Data Criação');
+                const dataCriacaoStr = getVal('Data Criação'); // Extrai exclusivamente da Coluna J
                 const previsaoStr = getVal('Previsão de execução');
-                const programadoVivoStr = getVal('Programação') || getVal('Prioridade Vivo'); // Coluna U
+                const programadoVivoStr = getVal('Programação') || getVal('Prioridade Vivo');
 
                 let ano = '';
                 let mes = '';
@@ -545,10 +545,10 @@
                     ano: ano,
                     mes: mes,
                     situacao: getVal('Situação Atividade'),
-                    responsavel: getVal('Responsabilidade') || getVal('Responsavel'), // Coluna X (Responsabilidade)
+                    responsavel: getVal('Responsabilidade') || getVal('Responsavel'), // Coluna X
                     detalhes: getVal('Detalhes_Informações'),
                     resumoPendencias: getVal('Resumo Pendencias'),
-                    reprogramacao: getVal('Reprogramação') || getVal('Reprogramacao') || '0',
+                    reprogramacao: getVal('Reprogramação') || getVal('Reprogramaco') || '0',
                     pontoBaremo: getVal('Ponto Baremo') || '0',
                     valorPrisma: getVal('Valor Prisma') || '0'
                 };
@@ -686,35 +686,38 @@
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // Regras de cálculo atualizadas
+        // Regras estritas conforme orientações:
+        // Total Demandas = Total do mês filtrado (71)
+        // Programadas = Coluna N == 'Liberado Execução' (55)
+        // Executadas = Coluna N == 'Executada em Campo' (22)
+        // Pendentes = Total Demandas - Executadas (71 - 22 = 49)
+        // Impedimento VIVO = Coluna N == 'Pendente VIVO' ou 'Pendencia Vivo'
         function atualizarKPIsEFinanceiro(dados) {
             const total = dados.length;
 
-            // 1. Programados: Coluna U = Liberado Execução + Concluido / Executada em Campo
+            // Programados: Coluna N = Liberado Execução
             const programadosList = dados.filter(d => {
-                const u = (d.programadoVivo || '').trim().toLowerCase();
                 const sit = (d.situacao || '').trim().toLowerCase();
-                return u === 'liberado execução' || u === 'liberado execucao' || u === 'concluido' || u === 'concluído' || sit === 'executada em campo';
+                return sit === 'liberado execução' || sit === 'liberado execucao';
             });
             const programados = programadosList.length;
 
-            // 2. Executadas: Coluna U = Concluido OU Coluna N = Executada em Campo
+            // Executadas: Coluna N = Executada em Campo
             const executadasList = dados.filter(d => {
-                const u = (d.programadoVivo || '').trim().toLowerCase();
                 const sit = (d.situacao || '').trim().toLowerCase();
-                return u === 'concluido' || u === 'concluído' || sit === 'executada em campo';
+                return sit === 'executada em campo';
             });
             const executadas = executadasList.length;
 
-            // 3. Pendentes: Coluna N != Executada em Campo
-            const pendentesList = dados.filter(d => {
-                const sit = (d.situacao || '').trim().toLowerCase();
-                return sit !== 'executada em campo';
-            });
-            const pendentes = pendentesList.length;
+            // Pendentes = Total Demandas - Executadas
+            const pendentes = total - executadas;
+            const pendentesList = dados.filter(d => (d.situacao || '').trim().toLowerCase() !== 'executada em campo');
 
-            // 4. Impedimento VIVO: Analisa Coluna X (Responsabilidade) == 'VIVO'
-            const vivoList = dados.filter(d => (d.responsavel || '').trim().toUpperCase() === 'VIVO');
+            // Impedimento VIVO: Coluna N == Pendente VIVO / Pendencia Vivo
+            const vivoList = dados.filter(d => {
+                const sit = (d.situacao || '').trim().toLowerCase();
+                return sit === 'pendente vivo' || sit === 'pendencia vivo' || sit === 'pendência vivo';
+            });
             const vivo = vivoList.length;
 
             const pctProg = total > 0 ? ((programados / total) * 100).toFixed(1) : 0;
@@ -1001,7 +1004,6 @@
                     porArea[d.area].executadas++;
                 }
 
-                // Analisa Coluna X (Responsabilidade) == 'VIVO'
                 if ((d.responsavel || '').trim().toUpperCase() === 'VIVO') {
                     porArea[d.area].vivo++;
                     if (d.resumoPendencias.includes('Agendamento')) porArea[d.area].vivoAgendamento++;
