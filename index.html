@@ -106,7 +106,7 @@
     <!-- CARDS DE KPIS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
         
-        <!-- 1. Total Demandas -->
+        <!-- Total Demandas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32">
             <div class="flex justify-between items-center text-slate-400">
                 <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
@@ -119,7 +119,7 @@
             </div>
         </div>
 
-        <!-- 2. Programados -->
+        <!-- Programados -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-sky-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600">Programados</span>
@@ -134,7 +134,7 @@
             </div>
         </div>
 
-        <!-- 3. Executadas -->
+        <!-- Executadas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-emerald-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
@@ -149,7 +149,7 @@
             </div>
         </div>
 
-        <!-- 4. Pendentes -->
+        <!-- Pendentes -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-amber-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
@@ -164,7 +164,7 @@
             </div>
         </div>
 
-        <!-- 5. Impedimento VIVO -->
+        <!-- Impedimento VIVO -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-purple-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Imped. VIVO</span>
@@ -429,7 +429,7 @@
 
         function abrirModalObs(site, texto) {
             document.getElementById('modal-site').innerText = site;
-            document.getElementById('modal-texto').innerText = texto || 'Sem observações registradas na Coluna V.';
+            document.getElementById('modal-texto').innerText = texto || 'Sem observações registradas.';
             document.getElementById('modal-obs').classList.remove('hidden');
         }
 
@@ -440,7 +440,6 @@
         async function carregarDados(forceRefresh = false) {
             setLoadingStatus(true, "Carregando dados...");
 
-            // Adiciona timestamp para forçar a limpeza de cache no Google Sheets e Proxies
             const cacheBuster = `&t=${new Date().getTime()}`;
             const urlPlanilha = CSV_ORIGINAL + cacheBuster;
 
@@ -496,14 +495,20 @@
             return str;
         }
 
+        // Função de busca insensível a acentos e espaços extras
+        function normalizarTexto(txt) {
+            return String(txt || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+        }
+
         function processarResultados(rawRows) {
             dadosGlobais = rawRows.map(item => {
-                const getVal = (chave) => {
-                    const keyEncontrada = Object.keys(item).find(k => k.trim().toLowerCase() === chave.trim().toLowerCase());
+                const getVal = (nomeBusca) => {
+                    const normBusca = normalizarTexto(nomeBusca);
+                    const keyEncontrada = Object.keys(item).find(k => normalizarTexto(k) === normBusca);
                     return keyEncontrada ? item[keyEncontrada] : '';
                 };
 
-                // Extração exata da Coluna J (Data Criação)
+                // Extração Estrita da Coluna J (Data Criação)
                 const dataCriacaoStr = getVal('Data Criação');
                 const previsaoStr = getVal('Previsão de execução');
                 const programadoVivoStr = getVal('Programação') || getVal('Prioridade Vivo');
@@ -549,11 +554,11 @@
                     programadoVivo: programadoVivoStr,
                     ano: ano,
                     mes: mes,
-                    situacao: getVal('Situação Atividade'),
+                    situacao: getVal('Situação Atividade'), // Coluna N
                     responsavel: getVal('Responsabilidade') || getVal('Responsavel'), // Coluna X
-                    detalhes: getVal('Detalhes_Informações'),
-                    resumoPendencias: getVal('Resumo Pendencias'),
-                    reprogramacao: getVal('Reprogramação') || getVal('Reprogramaco') || '0',
+                    detalhes: getVal('Detalhes_Informações'), // Coluna V
+                    resumoPendencias: getVal('Resumo Pendencias'), // Coluna W
+                    reprogramacao: getVal('Reprogramação') || getVal('Reprogramaco') || '0', // Coluna Y
                     pontoBaremo: getVal('Ponto Baremo') || '0',
                     valorPrisma: getVal('Valor Prisma') || '0'
                 };
@@ -691,32 +696,33 @@
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // Mapeamento dos Cards com base na Coluna N (Situação Atividade) e Regras Especificadas
+        // Mapeamento Estrito conforme regras definidas:
+        // Total Demandas = Total do mês filtrado (71)
+        // Programadas (55) = Coluna N == Liberado Execução
+        // Executadas (22) = Coluna N == Executada em Campo
+        // Pendentes = Total Demandas - Executadas (71 - 22 = 49)
+        // Impedimento VIVO = Coluna N == Pendente VIVO / Pendencia Vivo
         function atualizarKPIsEFinanceiro(dados) {
             const total = dados.length;
 
-            // 1. Programadas (55): Coluna N == Liberado Execução
             const programadosList = dados.filter(d => {
-                const sit = (d.situacao || '').trim().toLowerCase();
-                return sit === 'liberado execução' || sit === 'liberado execucao';
+                const sit = normalizarTexto(d.situacao);
+                return sit === 'liberado execucao' || sit === 'liberado execução';
             });
             const programados = programadosList.length;
 
-            // 2. Executadas (22): Coluna N == Executada em Campo
             const executadasList = dados.filter(d => {
-                const sit = (d.situacao || '').trim().toLowerCase();
+                const sit = normalizarTexto(d.situacao);
                 return sit === 'executada em campo';
             });
             const executadas = executadasList.length;
 
-            // 3. Pendentes (49): Total Demandas - Executadas
             const pendentes = total - executadas;
-            const pendentesList = dados.filter(d => (d.situacao || '').trim().toLowerCase() !== 'executada em campo');
+            const pendentesList = dados.filter(d => normalizarTexto(d.situacao) !== 'executada em campo');
 
-            // 4. Impedimento VIVO: Coluna N == Pendencia Vivo / Pendente VIVO
             const vivoList = dados.filter(d => {
-                const sit = (d.situacao || '').trim().toLowerCase();
-                return sit === 'pendente vivo' || sit === 'pendencia vivo' || sit === 'pendência vivo';
+                const sit = normalizarTexto(d.situacao);
+                return sit === 'pendente vivo' || sit === 'pendencia vivo';
             });
             const vivo = vivoList.length;
 
@@ -759,13 +765,13 @@
 
         function atualizarInsights(dados) {
             const total = dados.length;
-            const executadas = dados.filter(d => (d.situacao || '').trim().toLowerCase() === 'executada em campo').length;
+            const executadas = dados.filter(d => normalizarTexto(d.situacao) === 'executada em campo').length;
             const pct = total > 0 ? ((executadas / total) * 100).toFixed(1) : 0;
 
             const insExec = document.getElementById('insight-execucao');
             if (insExec) insExec.innerHTML = `Atualmente <strong>${pct}%</strong> das demandas (${executadas} de ${total}) foram concluídas no período.`;
 
-            const pendentes = dados.filter(d => (d.situacao || '').trim().toLowerCase() !== 'executada em campo');
+            const pendentes = dados.filter(d => normalizarTexto(d.situacao) !== 'executada em campo');
             const motivos = {};
             pendentes.forEach(d => {
                 if (d.resumoPendencias) motivos[d.resumoPendencias] = (motivos[d.resumoPendencias] || 0) + 1;
@@ -792,7 +798,7 @@
                         mapaDatas[d.dataIso] = { dataBr: d.dataBr, recebidas: 0, executadas: 0 };
                     }
                     mapaDatas[d.dataIso].recebidas++;
-                    if ((d.situacao || '').trim().toLowerCase() === 'executada em campo') {
+                    if (normalizarTexto(d.situacao) === 'executada em campo') {
                         mapaDatas[d.dataIso].executadas++;
                     }
                 }
@@ -911,7 +917,7 @@
         };
 
         function atualizarGraficoMotivos(dados) {
-            const pendentes = dados.filter(d => (d.situacao || '').trim().toLowerCase() !== 'executada em campo');
+            const pendentes = dados.filter(d => normalizarTexto(d.situacao) !== 'executada em campo');
             const motivos = {};
             let totalPendencias = 0;
 
@@ -1000,11 +1006,11 @@
                 const sitNome = d.situacao || 'Não Informado';
                 situacaoContagem[sitNome] = (situacaoContagem[sitNome] || 0) + 1;
 
-                if ((d.situacao || '').trim().toLowerCase() === 'executada em campo') {
+                if (normalizarTexto(d.situacao) === 'executada em campo') {
                     porArea[d.area].executadas++;
                 }
 
-                if ((d.responsavel || '').trim().toUpperCase() === 'VIVO') {
+                if (normalizarTexto(d.responsavel) === 'vivo') {
                     porArea[d.area].vivo++;
                     if (d.resumoPendencias.includes('Agendamento')) porArea[d.area].vivoAgendamento++;
                     if (d.resumoPendencias.includes('Rede')) porArea[d.area].vivoRede++;
@@ -1100,7 +1106,7 @@
             if (!tbody) return;
             tbody.innerHTML = '';
             dados.forEach(d => {
-                const badgeClass = d.situacao === 'Executada em Campo' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200';
+                const badgeClass = normalizarTexto(d.situacao) === 'executada em campo' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200';
                 
                 const obsTexto = (d.detalhes || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
