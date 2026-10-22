@@ -105,6 +105,8 @@
 
     <!-- CARDS DE KPIS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+        
+        <!-- 1. Total Demandas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32">
             <div class="flex justify-between items-center text-slate-400">
                 <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
@@ -117,6 +119,7 @@
             </div>
         </div>
 
+        <!-- 2. Programados -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-sky-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600">Programados</span>
@@ -131,6 +134,7 @@
             </div>
         </div>
 
+        <!-- 3. Executadas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-emerald-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
@@ -145,6 +149,7 @@
             </div>
         </div>
 
+        <!-- 4. Pendentes -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-amber-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
@@ -159,6 +164,7 @@
             </div>
         </div>
 
+        <!-- 5. Impedimento VIVO -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-purple-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Imped. VIVO</span>
@@ -172,6 +178,7 @@
                 <p id="fin-vivo-prisma" class="text-sm font-black text-purple-700">R$ 0,00</p>
             </div>
         </div>
+
     </section>
 
     <!-- PAINEL DE FILTROS -->
@@ -774,7 +781,6 @@
             if (insGargalo) insGargalo.innerHTML = `O principal motivo pendente é <strong>"${maiorMotivo}"</strong> com ${maiorQtd} ocorrência(s).`;
         }
 
-        // Gráfico de evolução abrangendo TODOS os dias do mês selecionado
         function atualizarGraficoEvolucao(dados) {
             const mapaDatas = {};
             dados.forEach(d => {
@@ -789,7 +795,6 @@
                 }
             });
 
-            // Determinar o período contínuo do mês selecionado
             let chavesIso = [];
             const chksMeses = Array.from(document.querySelectorAll('.chk-mes:checked')).map(c => c.value);
             const anoSel = document.getElementById('filtro-ano')?.value || new Date().getFullYear().toString();
@@ -996,6 +1001,7 @@
                     porArea[d.area].executadas++;
                 }
 
+                // Analisa Coluna X (Responsabilidade) == 'VIVO'
                 if ((d.responsavel || '').trim().toUpperCase() === 'VIVO') {
                     porArea[d.area].vivo++;
                     if (d.resumoPendencias.includes('Agendamento')) porArea[d.area].vivoAgendamento++;
