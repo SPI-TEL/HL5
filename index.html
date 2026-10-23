@@ -106,7 +106,7 @@
     <!-- CARDS DE KPIS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
         
-        <!-- Total Demandas -->
+        <!-- 1. Total Demandas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32">
             <div class="flex justify-between items-center text-slate-400">
                 <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
@@ -119,7 +119,7 @@
             </div>
         </div>
 
-        <!-- Programados -->
+        <!-- 2. Programados -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-sky-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600">Programados</span>
@@ -134,7 +134,7 @@
             </div>
         </div>
 
-        <!-- Executadas -->
+        <!-- 3. Executadas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-emerald-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
@@ -149,7 +149,7 @@
             </div>
         </div>
 
-        <!-- Pendentes -->
+        <!-- 4. Pendentes -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-amber-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
@@ -164,7 +164,7 @@
             </div>
         </div>
 
-        <!-- Impedimento VIVO -->
+        <!-- 5. Impedimento VIVO -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-purple-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Imped. VIVO</span>
@@ -984,6 +984,7 @@
             });
         }
 
+        // TABELA CONSOLIDADA POR ÁREA AJUSTADA COM REGRA ESTRITA DE IMPEDIMENTO VIVO (COLUNA N == Pendente Vivo)
         function atualizarTabelaAreaEChartSituacao(dados) {
             const porArea = {};
             const situacaoContagem = {};
@@ -1005,11 +1006,14 @@
                 const sitNome = d.situacao || 'Não Informado';
                 situacaoContagem[sitNome] = (situacaoContagem[sitNome] || 0) + 1;
 
-                if (normalizarTexto(d.situacao) === 'executada em campo') {
+                const normSit = normalizarTexto(d.situacao);
+
+                if (normSit === 'executada em campo') {
                     porArea[d.area].executadas++;
                 }
 
-                if (normalizarTexto(d.responsavel) === 'vivo') {
+                // Impedimento Vivo na Tabela: Coluna N (Situação Atividade) == 'Pendente Vivo' ou 'Pendencia Vivo'
+                if (normSit === 'pendente vivo' || normSit === 'pendencia vivo') {
                     porArea[d.area].vivo++;
                     if (d.resumoPendencias.includes('Agendamento')) porArea[d.area].vivoAgendamento++;
                     if (d.resumoPendencias.includes('Rede')) porArea[d.area].vivoRede++;
