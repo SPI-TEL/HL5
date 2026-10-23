@@ -105,6 +105,8 @@
 
     <!-- CARDS DE KPIS -->
     <section class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
+        
+        <!-- Total Demandas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32">
             <div class="flex justify-between items-center text-slate-400">
                 <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
@@ -117,6 +119,7 @@
             </div>
         </div>
 
+        <!-- Programados -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-sky-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600">Programados</span>
@@ -131,6 +134,7 @@
             </div>
         </div>
 
+        <!-- Executadas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-emerald-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
@@ -145,6 +149,7 @@
             </div>
         </div>
 
+        <!-- Pendentes -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-amber-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
@@ -159,6 +164,7 @@
             </div>
         </div>
 
+        <!-- Impedimento VIVO -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-purple-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Imped. VIVO</span>
@@ -172,6 +178,7 @@
                 <p id="fin-vivo-prisma" class="text-sm font-black text-purple-700">R$ 0,00</p>
             </div>
         </div>
+
     </section>
 
     <!-- PAINEL DE FILTROS -->
@@ -380,7 +387,7 @@
     <script>
         Chart.register(ChartDataLabels);
 
-        // URL COM PARÂMETRO GID=1085677200 PARA CARREGAR A ABA CORRETA DA PLANILHA (71 DEMANDAS)
+        // URL COM GID DA ABA CORRETA (1085677200)
         const CSV_ORIGINAL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSal4I1LQGFkVZipyOLlY_OMR4LFLofU-dOSHZprenGm0aBMcxuEDNnnHkI5jfeuj7WTNwuVrs1zp65/pub?gid=1085677200&single=true&output=csv';
         const PROXY_RAPIDO = 'https://corsproxy.io/?';
         const PROXY_BACKUP = 'https://api.allorigins.win/raw?url=';
@@ -689,14 +696,14 @@
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // CÁLCULOS ESTRITOS CONFORME AS REGRAS SOLICITADAS
+        // CÁLCULOS ESTRITOS CONFORME AS SUAS REGRAS DEFINIDAS
         function atualizarKPIsEFinanceiro(dados) {
             const total = dados.length;
 
-            // Programadas (55): Coluna N == 'Liberado Execução'
+            // Programadas (55): Coluna U == 'Passivo'
             const programadosList = dados.filter(d => {
-                const sit = normalizarTexto(d.situacao);
-                return sit === 'liberado execucao' || sit === 'liberado execução';
+                const progU = normalizarTexto(d.programadoVivo);
+                return progU === 'passivo';
             });
             const programados = programadosList.length;
 
@@ -707,11 +714,11 @@
             });
             const executadas = executadasList.length;
 
-            // Pendentes (49) = Total Demandas (71) - Executadas (22)
+            // Pendentes (49) = Total Demandas - Executadas
             const pendentes = total - executadas;
             const pendentesList = dados.filter(d => normalizarTexto(d.situacao) !== 'executada em campo');
 
-            // Impedimento VIVO: Coluna N == 'Pendente Vivo' ou 'Pendencia Vivo'
+            // Impedimento VIVO: Coluna N == 'Pendente VIVO' ou 'Pendencia Vivo'
             const vivoList = dados.filter(d => {
                 const sit = normalizarTexto(d.situacao);
                 return sit === 'pendente vivo' || sit === 'pendencia vivo';
