@@ -90,7 +90,7 @@
             </div>
         </div>
 
-        <!-- 2. Passivos (Antigo Programados) -->
+        <!-- 2. Passivos -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-sky-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600">Passivos</span>
@@ -105,7 +105,7 @@
             </div>
         </div>
 
-        <!-- 3. Programados (Novo: Passivos Coluna U + Data de Execução Coluna S) -->
+        <!-- 3. Programados -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-indigo-500">
             <div class="flex justify-between items-center">
                 <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">Programados</span>
@@ -167,7 +167,7 @@
 
     </section>
 
-    <!-- PAINEL DE FILTROS -->
+    <!-- PAINEL DE FILTROS REORGANIZADO -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -179,7 +179,7 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-7 gap-3">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Ano</label>
                 <select id="filtro-ano" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
@@ -234,10 +234,21 @@
                 </div>
             </div>
 
+            <!-- 1. FILTRO RENOMEADO PARA PASSIVO -->
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Passivo</label>
+                <select id="filtro-passivo" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
+                    <option value="">Todos os Status</option>
+                </select>
+            </div>
+
+            <!-- 2. NOVO FILTRO PROGRAMADO (SIM / NÃO) -->
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Programado</label>
                 <select id="filtro-programado" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
-                    <option value="">Todos os Status</option>
+                    <option value="">Todos</option>
+                    <option value="sim">Sim</option>
+                    <option value="nao">Não</option>
                 </select>
             </div>
 
@@ -511,8 +522,8 @@
                 };
 
                 const dataCriacaoStr = getVal('Data Criação');
-                const previsaoStr = getVal('Previsão de execução'); // Coluna S
-                const programadoVivoStr = getVal('Programação') || getVal('Prioridade Vivo'); // Coluna U
+                const previsaoStr = getVal('Previsão de execução');
+                const programadoVivoStr = getVal('Programação') || getVal('Prioridade Vivo');
 
                 let ano = '';
                 let mes = '';
@@ -542,6 +553,11 @@
                     }
                 }
 
+                // Identifica se a linha atende aos critérios do card "Programados" (Passivo + Data de Execução)
+                const temDataExec = (previsaoStr || '').trim() !== '' && normalizarTexto(previsaoStr) !== 'pendente';
+                const ehPassivo = normalizarTexto(programadoVivoStr) === 'passivo';
+                const eProgramado = ehPassivo && temDataExec;
+
                 return {
                     site: getVal('Site'),
                     os: getVal('OS PRISMA'),
@@ -552,15 +568,16 @@
                     dataBr: dataFormatadaBr,
                     dataIso: dataIso,
                     previsaoExecucao: formatarDataBr(previsaoStr),
-                    previsaoIso: converterDataParaIso(previsaoStr), // ISO Coluna S
+                    previsaoIso: converterDataParaIso(previsaoStr),
                     programadoVivo: programadoVivoStr,
+                    isProgramado: eProgramado ? 'sim' : 'nao',
                     ano: ano,
                     mes: mes,
-                    situacao: getVal('Situação Atividade'), // Coluna N
-                    responsavel: getVal('Responsabilidade') || getVal('Responsavel'), // Coluna X
-                    detalhes: getVal('Detalhes_Informações'), // Coluna V
-                    resumoPendencias: getVal('Resumo Pendencias'), // Coluna W
-                    reprogramacao: getVal('Reprogramação') || getVal('Reprogramaco') || '0', // Coluna Y
+                    situacao: getVal('Situação Atividade'),
+                    responsavel: getVal('Responsabilidade') || getVal('Responsavel'),
+                    detalhes: getVal('Detalhes_Informações'),
+                    resumoPendencias: getVal('Resumo Pendencias'),
+                    reprogramacao: getVal('Reprogramação') || getVal('Reprogramaco') || '0',
                     pontoBaremo: getVal('Ponto Baremo') || '0',
                     valorPrisma: getVal('Valor Prisma') || '0'
                 };
@@ -618,14 +635,14 @@
 
         function popularFiltros(dados) {
             const anos = [...new Set(dados.map(d => d.ano).filter(a => a !== ''))].sort().reverse();
-            const programados = [...new Set(dados.map(d => d.programadoVivo).filter(p => p !== ''))].sort();
+            const passivos = [...new Set(dados.map(d => d.programadoVivo).filter(p => p !== ''))].sort();
             const areas = [...new Set(dados.map(d => d.area))].sort();
             const coords = [...new Set(dados.map(d => d.coordenador))].sort();
             const situacoes = [...new Set(dados.map(d => d.situacao))].sort();
             const responsaveisPend = [...new Set(dados.map(d => d.resumoPendencias).filter(r => r !== ''))].sort();
 
             preencherSelect('filtro-ano', anos);
-            preencherSelect('filtro-programado', programados);
+            preencherSelect('filtro-passivo', passivos);
             preencherSelect('filtro-area', areas);
             preencherSelect('filtro-coordenador', coords);
             preencherSelect('filtro-situacao', situacoes);
@@ -648,6 +665,7 @@
             document.querySelectorAll('.chk-mes').forEach(c => c.checked = false);
             document.getElementById("label-meses-sel").innerText = "Todos os Meses";
 
+            document.getElementById('filtro-passivo').value = '';
             document.getElementById('filtro-programado').value = '';
             document.getElementById('filtro-area').value = '';
             document.getElementById('filtro-coordenador').value = '';
@@ -662,6 +680,7 @@
             const ano = document.getElementById('filtro-ano')?.value || '';
             const chksMeses = Array.from(document.querySelectorAll('.chk-mes:checked')).map(c => c.value);
 
+            const passivo = document.getElementById('filtro-passivo')?.value || '';
             const programado = document.getElementById('filtro-programado')?.value || '';
             const area = document.getElementById('filtro-area')?.value || '';
             const coord = document.getElementById('filtro-coordenador')?.value || '';
@@ -671,13 +690,14 @@
             const filtrados = dadosGlobais.filter(d => {
                 const matchAno = !ano || d.ano === ano;
                 const matchMes = chksMeses.length === 0 || chksMeses.includes(d.mes);
-                const matchProgramado = !programado || d.programadoVivo === programado;
+                const matchPassivo = !passivo || d.programadoVivo === passivo;
+                const matchProgramado = !programado || d.isProgramado === programado;
                 const matchArea = !area || d.area === area;
                 const matchCoord = !coord || d.coordenador === coord;
                 const matchSituacao = !situacao || d.situacao === situacao;
                 const matchRespPend = !respPend || d.resumoPendencias === respPend;
 
-                return matchAno && matchMes && matchProgramado && matchArea && matchCoord && matchSituacao && matchRespPend;
+                return matchAno && matchMes && matchPassivo && matchProgramado && matchArea && matchCoord && matchSituacao && matchRespPend;
             });
 
             atualizarKPIsEFinanceiro(filtrados);
@@ -697,7 +717,6 @@
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // REGRAS DE KPIS ATUALIZADAS
         function atualizarKPIsEFinanceiro(dados) {
             const total = dados.length;
 
@@ -708,12 +727,8 @@
             });
             const passivos = passivosList.length;
 
-            // 2. Programados (Novo): Coluna U == 'Passivo' E Coluna S (Previsão de execução) possui data preenchida
-            const programadosList = dados.filter(d => {
-                const progU = normalizarTexto(d.programadoVivo);
-                const temDataExec = (d.previsaoExecucao || '').trim() !== '' && normalizarTexto(d.previsaoExecucao) !== 'pendente';
-                return progU === 'passivo' && temDataExec;
-            });
+            // 2. Programados: Coluna U == 'Passivo' E Coluna S (Previsão de execução) possui data preenchida
+            const programadosList = dados.filter(d => d.isProgramado === 'sim');
             const programados = programadosList.length;
 
             // 3. Executadas: Coluna N == 'Executada em Campo'
@@ -727,7 +742,7 @@
             const pendentes = total - executadas;
             const pendentesList = dados.filter(d => normalizarTexto(d.situacao) !== 'executada em campo');
 
-            // 5. Impedimento VIVO: Coluna N == 'Pendente VIVO' ou 'Pendencia Vivo'
+            // 5. Impedimento VIVO: Coluna N == 'Pendente Vivo' ou 'Pendencia Vivo'
             const vivoList = dados.filter(d => {
                 const sit = normalizarTexto(d.situacao);
                 return sit === 'pendente vivo' || sit === 'pendencia vivo';
