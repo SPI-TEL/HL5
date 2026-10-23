@@ -387,7 +387,6 @@
     <script>
         Chart.register(ChartDataLabels);
 
-        // URL COM GID DA ABA CORRETA (1085677200)
         const CSV_ORIGINAL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSal4I1LQGFkVZipyOLlY_OMR4LFLofU-dOSHZprenGm0aBMcxuEDNnnHkI5jfeuj7WTNwuVrs1zp65/pub?gid=1085677200&single=true&output=csv';
         const PROXY_RAPIDO = 'https://corsproxy.io/?';
         const PROXY_BACKUP = 'https://api.allorigins.win/raw?url=';
@@ -440,6 +439,23 @@
 
         function normalizarTexto(txt) {
             return String(txt || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim().toLowerCase();
+        }
+
+        function converterDataParaIso(str) {
+            if (!str) return '';
+            const partes = str.split('/');
+            if (partes.length === 2) {
+                const p1 = partes[0].padStart(2, '0');
+                const p2 = partes[1].padStart(2, '0');
+                const ano = new Date().getFullYear().toString();
+                return `${ano}-${p1}-${p2}`;
+            } else if (partes.length === 3) {
+                const p1 = partes[0].padStart(2, '0');
+                const p2 = partes[1].padStart(2, '0');
+                const p3 = partes[2].length === 2 ? '20' + partes[2] : partes[2];
+                return `${p3}-${p2}-${p1}`;
+            }
+            return '';
         }
 
         async function carregarDados(forceRefresh = false) {
@@ -508,9 +524,8 @@
                     return keyEncontrada ? item[keyEncontrada] : '';
                 };
 
-                // Extração Estrita da Coluna J (Data Criação)
                 const dataCriacaoStr = getVal('Data Criação');
-                const previsaoStr = getVal('Previsão de execução');
+                const previsaoStr = getVal('Previsão de execução'); // Coluna S
                 const programadoVivoStr = getVal('Programação') || getVal('Prioridade Vivo');
 
                 let ano = '';
@@ -551,6 +566,7 @@
                     dataBr: dataFormatadaBr,
                     dataIso: dataIso,
                     previsaoExecucao: formatarDataBr(previsaoStr),
+                    previsaoIso: converterDataParaIso(previsaoStr), // ISO da Coluna S para o gráfico
                     programadoVivo: programadoVivoStr,
                     ano: ano,
                     mes: mes,
@@ -696,7 +712,6 @@
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         }
 
-        // CÁLCULOS ESTRITOS CONFORME AS SUAS REGRAS DEFINIDAS
         function atualizarKPIsEFinanceiro(dados) {
             const total = dados.length;
 
@@ -789,17 +804,28 @@
             if (insGargalo) insGargalo.innerHTML = `O principal motivo pendente é <strong>"${maiorMotivo}"</strong> com ${maiorQtd} ocorrência(s).`;
         }
 
+        // ATUALIZAÇÃO DO GRÁFICO COM COLUNA AZUL CLARO PARA PROGRAMADOS (COLUNA S - PREVISÃO DE EXECUÇÃO)
         function atualizarGraficoEvolucao(dados) {
             const mapaDatas = {};
+
+            // Mapeia tanto a data de criação (Coluna J) quanto a Previsão de Execução (Coluna S)
             dados.forEach(d => {
                 if (d.dataIso) {
                     if (!mapaDatas[d.dataIso]) {
-                        mapaDatas[d.dataIso] = { dataBr: d.dataBr, recebidas: 0, executadas: 0 };
+                        mapaDatas[d.dataIso] = { dataBr: d.dataBr, recebidas: 0, executadas: 0, programados: 0 };
                     }
                     mapaDatas[d.dataIso].recebidas++;
                     if (normalizarTexto(d.situacao) === 'executada em campo') {
                         mapaDatas[d.dataIso].executadas++;
                     }
+                }
+
+                // Contabiliza Programados através da Coluna S (Previsão de Execução)
+                if (d.previsaoIso) {
+                    if (!mapaDatas[d.previsaoIso]) {
+                        mapaDatas[d.previsaoIso] = { dataBr: d.previsaoExecucao, recebidas: 0, executadas: 0, programados: 0 };
+                    }
+                    mapaDatas[d.previsaoIso].programados++;
                 }
             });
 
@@ -819,7 +845,7 @@
                     const brKey = `${dStr}/${mStr}/${ano}`;
                     
                     if (!mapaDatas[isoKey]) {
-                        mapaDatas[isoKey] = { dataBr: brKey, recebidas: 0, executadas: 0 };
+                        mapaDatas[isoKey] = { dataBr: brKey, recebidas: 0, executadas: 0, programados: 0 };
                     }
                     chavesIso.push(isoKey);
                 }
@@ -830,6 +856,7 @@
 
             const labelsBr = chavesIso.map(k => mapaDatas[k].dataBr);
             const recebidas = chavesIso.map(k => mapaDatas[k].recebidas);
+            const programados = chavesIso.map(k => mapaDatas[k].programados);
             const executadas = chavesIso.map(k => mapaDatas[k].executadas);
 
             let acumuladoRecebidas = 0;
@@ -854,6 +881,15 @@
                             label: 'Demandas Recebidas',
                             data: recebidas,
                             backgroundColor: '#0284c7',
+                            borderRadius: 6
+                        },
+                        {
+                            type: 'bar',
+                            label: 'Programados (Prev. Execução)',
+                            data: programados,
+                            backgroundColor: 'rgba(56, 189, 248, 0.65)', // Azul Claro Semitransparente
+                            borderColor: '#38bdf8',
+                            borderWidth: 1,
                             borderRadius: 6
                         },
                         {
@@ -984,7 +1020,6 @@
             });
         }
 
-        // TABELA CONSOLIDADA POR ÁREA AJUSTADA COM REGRA ESTRITA DE IMPEDIMENTO VIVO (COLUNA N == Pendente Vivo)
         function atualizarTabelaAreaEChartSituacao(dados) {
             const porArea = {};
             const situacaoContagem = {};
@@ -1012,7 +1047,6 @@
                     porArea[d.area].executadas++;
                 }
 
-                // Impedimento Vivo na Tabela: Coluna N (Situação Atividade) == 'Pendente Vivo' ou 'Pendencia Vivo'
                 if (normSit === 'pendente vivo' || normSit === 'pendencia vivo') {
                     porArea[d.area].vivo++;
                     if (d.resumoPendencias.includes('Agendamento')) porArea[d.area].vivoAgendamento++;
