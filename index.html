@@ -77,16 +77,18 @@
     <!-- CARDS DE KPIS (6 COLUNAS) -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
         
-        <!-- 1. Total Demandas -->
+        <!-- 1. Total Demandas (Baremo padronizado estilo % dos outros cards) -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32">
             <div class="flex justify-between items-center text-slate-400">
                 <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
                 <i class="fa-solid fa-circle-info text-xs text-slate-400"></i>
             </div>
-            <p id="kpi-recebidas" class="text-3xl font-black text-slate-800">0</p>
-            <div class="border-t border-slate-100 pt-2 flex justify-between items-center space-x-1 overflow-hidden">
-                <span class="text-[8px] font-semibold text-sky-700 bg-sky-50 border border-sky-100 px-1 py-0.5 rounded whitespace-nowrap shrink-0">Baremo: R$ 166,72</span>
-                <p id="fin-total-prisma" class="text-xs md:text-sm font-black text-slate-800 truncate">R$ 0,00</p>
+            <div class="flex items-baseline justify-between">
+                <p id="kpi-recebidas" class="text-3xl font-black text-slate-800">0</p>
+                <span class="text-[10px] bg-sky-50 text-sky-700 px-2 py-0.5 rounded-md font-bold">Baremo: R$ 166,72</span>
+            </div>
+            <div class="border-t border-slate-100 pt-2 text-right">
+                <p id="fin-total-prisma" class="text-sm font-black text-slate-800">R$ 0,00</p>
             </div>
         </div>
 
@@ -167,7 +169,7 @@
 
     </section>
 
-    <!-- PAINEL DE FILTROS REORGANIZADO -->
+    <!-- PAINEL DE FILTROS -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -717,29 +719,24 @@
         function atualizarKPIsEFinanceiro(dados) {
             const total = dados.length;
 
-            // 1. Passivos: Coluna U == 'Passivo'
             const passivosList = dados.filter(d => {
                 const progU = normalizarTexto(d.programadoVivo);
                 return progU === 'passivo';
             });
             const passivos = passivosList.length;
 
-            // 2. Programados: Coluna U == 'Passivo' E Coluna S (Previsão de execução) possui data
             const programadosList = dados.filter(d => d.isProgramado === 'sim');
             const programados = programadosList.length;
 
-            // 3. Executadas: Coluna N == 'Executada em Campo'
             const executadasList = dados.filter(d => {
                 const sit = normalizarTexto(d.situacao);
                 return sit === 'executada em campo';
             });
             const executadas = executadasList.length;
 
-            // 4. Pendentes = Total Demandas - Executadas
             const pendentes = total - executadas;
             const pendentesList = dados.filter(d => normalizarTexto(d.situacao) !== 'executada em campo');
 
-            // 5. Impedimento VIVO: Coluna N == 'Pendente Vivo' ou 'Pendencia Vivo'
             const vivoList = dados.filter(d => {
                 const sit = normalizarTexto(d.situacao);
                 return sit === 'pendente vivo' || sit === 'pendencia vivo';
