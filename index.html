@@ -77,7 +77,7 @@
     <!-- CARDS DE KPIS (6 COLUNAS) -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
         
-        <!-- 1. Total Demandas (Baremo padronizado estilo % dos outros cards) -->
+        <!-- 1. Total Demandas -->
         <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32">
             <div class="flex justify-between items-center text-slate-400">
                 <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
@@ -296,8 +296,9 @@
         </div>
     </div>
 
-    <!-- CONSOLIDADO POR ÁREA -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <!-- CONSOLIDADO POR ÁREA + GRÁFICO PIZZA REPROGRAMAÇÕES + SITUAÇÃO DA ATIVIDADE -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <!-- 1. Tabela Consolidada por Área com IMPED. TEL em azul -->
         <section class="lg:col-span-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">CONSOLIDADO POR ÁREA OPERACIONAL</h3>
             <div class="overflow-x-auto">
@@ -308,7 +309,8 @@
                             <th class="p-2.5 text-center">Recebidas</th>
                             <th class="p-2.5 text-center">Executadas</th>
                             <th class="p-2.5 text-center">Pendentes</th>
-                            <th class="p-2.5 text-center bg-purple-50 text-purple-700 font-extrabold rounded-tl-lg">IMPED. VIVO</th>
+                            <!-- Coluna alterada para Impedimento TEL com letras azuis -->
+                            <th class="p-2.5 text-center bg-sky-50 text-sky-600 font-extrabold rounded-tl-lg">IMPED. TEL</th>
                             <th class="p-2.5 text-center bg-purple-50/70 text-purple-700">AGENDAMENTO</th>
                             <th class="p-2.5 text-center bg-purple-50/70 text-purple-700">REDE / EXTERNA</th>
                             <th class="p-2.5 text-center bg-purple-50/70 text-purple-700 rounded-tr-lg">SCRIPT / ILHA</th>
@@ -319,6 +321,15 @@
             </div>
         </section>
 
+        <!-- 2. NOVO GRÁFICO PIZZA: MOTIVOS DE REPROGRAMAÇÃO (COLUNAS AA, AB, AC, AD) -->
+        <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">MOTIVOS DE REPROGRAMAÇÃO</h3>
+            <div class="h-64 flex items-center justify-center relative p-2">
+                <canvas id="chartReprogramacao"></canvas>
+            </div>
+        </section>
+
+        <!-- 3. Situação da Atividade -->
         <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">SITUAÇÃO DA ATIVIDADE</h3>
             <div class="h-64 flex items-center justify-center relative p-2">
@@ -391,6 +402,7 @@
         let dadosGlobais = [];
         let chartEvolucaoObj = null;
         let chartMotivosObj = null;
+        let chartReprogramacaoObj = null;
         let chartSituacaoObj = null;
         let primeiraCarga = true;
 
@@ -515,9 +527,10 @@
 
         function processarResultados(rawRows) {
             dadosGlobais = rawRows.map(item => {
+                const keys = Object.keys(item);
                 const getVal = (nomeBusca) => {
                     const normBusca = normalizarTexto(nomeBusca);
-                    const keyEncontrada = Object.keys(item).find(k => normalizarTexto(k) === normBusca);
+                    const keyEncontrada = keys.find(k => normalizarTexto(k) === normBusca);
                     return keyEncontrada ? item[keyEncontrada] : '';
                 };
 
@@ -557,6 +570,17 @@
                 const ehPassivo = normalizarTexto(programadoVivoStr) === 'passivo';
                 const eProgramado = ehPassivo && temDataExec;
 
+                // Captura dos motivos de Reprogramações (Colunas AA, AB, AC, AD -> Índices 26, 27, 28, 29)
+                const motivosReprog = [];
+                [26, 27, 28, 29].forEach(idx => {
+                    if (keys[idx] && item[keys[idx]]) {
+                        const val = String(item[keys[idx]]).trim();
+                        if (val && normalizarTexto(val) !== 'pendente' && val !== '-' && val !== '0') {
+                            motivosReprog.push(val);
+                        }
+                    }
+                });
+
                 return {
                     site: getVal('Site'),
                     os: getVal('OS PRISMA'),
@@ -570,6 +594,7 @@
                     previsaoIso: converterDataParaIso(previsaoStr),
                     programadoVivo: programadoVivoStr,
                     isProgramado: eProgramado ? 'sim' : 'nao',
+                    motivosReprogramacao: motivosReprog,
                     ano: ano,
                     mes: mes,
                     situacao: getVal('Situação Atividade'),
@@ -1001,9 +1026,11 @@
             });
         }
 
+        // ATUALIZAÇÃO DO CONSOLIDADO POR ÁREA E DOS GRÁFICOS PIZZA
         function atualizarTabelaAreaEChartSituacao(dados) {
             const porArea = {};
             const situacaoContagem = {};
+            const reprogramacaoContagem = {};
 
             dados.forEach(d => {
                 if (!porArea[d.area]) {
@@ -1011,7 +1038,7 @@
                         recebidas: 0, 
                         executadas: 0, 
                         pendentes: 0, 
-                        vivo: 0, 
+                        tel: 0, 
                         vivoAgendamento: 0, 
                         vivoRede: 0, 
                         vivoScript: 0 
@@ -1023,19 +1050,32 @@
                 situacaoContagem[sitNome] = (situacaoContagem[sitNome] || 0) + 1;
 
                 const normSit = normalizarTexto(d.situacao);
+                const normResp = normalizarTexto(d.responsavel);
 
                 if (normSit === 'executada em campo') {
                     porArea[d.area].executadas++;
                 }
 
-                if (normSit === 'pendente vivo' || normSit === 'pendencia vivo') {
-                    porArea[d.area].vivo++;
+                // Impedimento TEL (em substituição ao Impedimento Vivo na tabela)
+                if (normResp === 'tel' && normSit !== 'executada em campo') {
+                    porArea[d.area].tel++;
+                }
+
+                if (normSit.includes('vivo') || normResp === 'vivo') {
                     if (d.resumoPendencias.includes('Agendamento')) porArea[d.area].vivoAgendamento++;
                     if (d.resumoPendencias.includes('Rede')) porArea[d.area].vivoRede++;
                     if (d.resumoPendencias.includes('SCRIPT') || d.resumoPendencias.includes('Ilha')) porArea[d.area].vivoScript++;
                 }
+
+                // Acumula motivos das Colunas AA, AB, AC, AD
+                if (d.motivosReprogramacao && d.motivosReprogramacao.length > 0) {
+                    d.motivosReprogramacao.forEach(motivo => {
+                        reprogramacaoContagem[motivo] = (reprogramacaoContagem[motivo] || 0) + 1;
+                    });
+                }
             });
 
+            // 1. Tabela Consolidada com IMPED. TEL em azul
             const tbody = document.getElementById('tbody-area');
             if (tbody) {
                 tbody.innerHTML = '';
@@ -1049,7 +1089,7 @@
                             <td class="p-2.5 font-semibold text-slate-700 text-center">${item.recebidas}</td>
                             <td class="p-2.5 text-emerald-600 font-bold text-center">${item.executadas}</td>
                             <td class="p-2.5 text-amber-600 font-bold text-center">${pendenteCalculado}</td>
-                            <td class="p-2.5 text-purple-700 font-bold text-center bg-purple-50/50">${item.vivo}</td>
+                            <td class="p-2.5 text-sky-600 font-bold text-center bg-sky-50/70">${item.tel}</td>
                             <td class="p-2.5 text-purple-700 text-center bg-purple-50/30">${item.vivoAgendamento}</td>
                             <td class="p-2.5 text-purple-700 text-center bg-purple-50/30">${item.vivoRede}</td>
                             <td class="p-2.5 text-purple-700 text-center bg-purple-50/30">${item.vivoScript}</td>
@@ -1058,13 +1098,75 @@
                 });
             }
 
+            // 2. Gráfico Pizza: Motivos de Reprogramação (Colunas AA, AB, AC, AD)
+            const canvasReprog = document.getElementById('chartReprogramacao');
+            if (canvasReprog) {
+                const ctxReprog = canvasReprog.getContext('2d');
+                if (chartReprogramacaoObj) chartReprogramacaoObj.destroy();
+
+                const reprogLabels = Object.keys(reprogramacaoContagem);
+                const reprogValues = Object.values(reprogramacaoContagem);
+                const totalReprog = reprogValues.reduce((acc, curr) => acc + curr, 0);
+
+                const paletaCores = [
+                    '#0284c7', '#38bdf8', '#818cf8', '#a855f7', 
+                    '#f59e0b', '#10b981', '#f43f5e', '#64748b'
+                ];
+
+                chartReprogramacaoObj = new Chart(ctxReprog, {
+                    type: 'pie',
+                    data: {
+                        labels: reprogLabels.length > 0 ? reprogLabels : ['Sem Reprogramação'],
+                        datasets: [{
+                            data: reprogValues.length > 0 ? reprogValues : [1],
+                            backgroundColor: reprogValues.length > 0 ? paletaCores.slice(0, reprogLabels.length) : ['#e2e8f0'],
+                            borderWidth: 2,
+                            borderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        layout: { padding: 30 },
+                        plugins: {
+                            legend: { display: false },
+                            datalabels: {
+                                display: totalReprog > 0,
+                                color: '#334155',
+                                font: { size: 9, weight: 'bold', family: 'Inter, sans-serif' },
+                                textAlign: 'center',
+                                anchor: 'end',
+                                align: 'end',
+                                offset: 6,
+                                formatter: function(value, context) {
+                                    if (!totalReprog) return '';
+                                    const label = context.chart.data.labels[context.dataIndex];
+                                    const pct = ((value / totalReprog) * 100).toFixed(1);
+                                    return `${label}\n(${value} - ${pct}%)`;
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        if (!totalReprog) return 'Sem registros';
+                                        const val = context.parsed;
+                                        const pct = ((val / totalReprog) * 100).toFixed(1);
+                                        return ` ${context.label}: ${val} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 3. Gráfico de Rosca: Situação da Atividade
             const canvasSituacao = document.getElementById('chartSituacao');
             if (canvasSituacao) {
                 const ctx = canvasSituacao.getContext('2d');
                 if (chartSituacaoObj) chartSituacaoObj.destroy();
 
                 const totalGeral = dados.length;
-                
                 const colorMap = {
                     'Pendente Execução': '#10b981',  
                     'Executada em Campo': '#f59e0b', 
@@ -1089,20 +1191,12 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        layout: {
-                            padding: 30
-                        },
+                        layout: { padding: 30 },
                         plugins: {
-                            legend: {
-                                display: false 
-                            },
+                            legend: { display: false },
                             datalabels: {
                                 color: '#475569',
-                                font: {
-                                    size: 10,
-                                    weight: 'bold',
-                                    family: 'Inter, sans-serif'
-                                },
+                                font: { size: 10, weight: 'bold', family: 'Inter, sans-serif' },
                                 textAlign: 'center',
                                 anchor: 'end',
                                 align: 'end',
@@ -1125,7 +1219,6 @@
             tbody.innerHTML = '';
             dados.forEach(d => {
                 const badgeClass = normalizarTexto(d.situacao) === 'executada em campo' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200';
-                
                 const obsTexto = (d.detalhes || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
 
                 tbody.innerHTML += `
