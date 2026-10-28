@@ -74,7 +74,7 @@
         </span>
     </div>
 
-    <!-- CARDS DE KPIS COM ALTURA REDUZIDA (h-26) -->
+    <!-- CARDS DE KPIS (6 COLUNAS COMPACTAS) -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
         
         <!-- 1. Total Demandas -->
@@ -169,7 +169,7 @@
 
     </section>
 
-    <!-- PAINEL DE FILTROS -->
+    <!-- PAINEL DE FILTROS REORGANIZADO -->
     <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-3">
         <div class="flex items-center justify-between border-b border-slate-100 pb-2">
             <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">
@@ -181,7 +181,7 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-9 gap-2.5">
             <div>
                 <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Ano</label>
                 <select id="filtro-ano" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2.5 focus:border-sky-500 focus:bg-white outline-none">
@@ -234,6 +234,12 @@
                         <input type="checkbox" value="12" class="chk-mes rounded text-sky-600" onchange="atualizarSelecaoMeses()"> <span>12 - Dezembro</span>
                     </label>
                 </div>
+            </div>
+
+            <!-- NOVO FILTRO ESPECÍFICO POR DATA -->
+            <div>
+                <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Data Criação</label>
+                <input type="date" id="filtro-data" onchange="aplicarFiltros()" class="w-full text-xs bg-slate-50 text-slate-700 border border-slate-200 rounded-xl p-2 focus:border-sky-500 focus:bg-white outline-none">
             </div>
 
             <div>
@@ -296,45 +302,54 @@
         </div>
     </div>
 
-    <!-- CONSOLIDADO POR ÁREA AMPLIADO (6/12) + GRÁFICOS REDUZIDOS (3/12 CADA) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <!-- 1. Tabela Consolidada com comprimento ampliado (ocupa 6 colunas = 50%) -->
-        <section class="lg:col-span-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
-            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">CONSOLIDADO POR ÁREA OPERACIONAL</h3>
-            <div class="overflow-x-auto">
-                <table class="w-full text-xs text-left text-slate-600">
-                    <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
-                        <tr>
-                            <th class="p-2.5 text-left">Área</th>
-                            <th class="p-2.5 text-center">Recebidas</th>
-                            <th class="p-2.5 text-center">Executadas</th>
-                            <th class="p-2.5 text-center">Pendentes</th>
-                            <th class="p-2.5 text-center bg-sky-50 text-sky-600 font-extrabold rounded-tl-lg">IMPED. TEL</th>
-                            <th class="p-2.5 text-center bg-purple-50/70 text-purple-700">AGENDAMENTO</th>
-                            <th class="p-2.5 text-center bg-purple-50/70 text-purple-700">REDE / EXTERNA</th>
-                            <th class="p-2.5 text-center bg-purple-50/70 text-purple-700 rounded-tr-lg">SCRIPT / ILHA</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbody-area" class="divide-y divide-slate-100"></tbody>
-                </table>
+    <!-- SEÇÃO COM 65% PARA CONSOLIDADO E 35% PARA GRÁFICOS DE PIZZA -->
+    <div class="flex flex-col lg:flex-row gap-4 items-stretch">
+        
+        <!-- 1. Consolidado por Área (65% da largura total) -->
+        <section class="w-full lg:w-[65%] bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+                <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">CONSOLIDADO POR ÁREA OPERACIONAL</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-xs text-left text-slate-600">
+                        <thead class="bg-slate-50 text-slate-500 uppercase font-bold border-b border-slate-200">
+                            <tr>
+                                <th class="p-2.5 text-left">Área</th>
+                                <th class="p-2.5 text-center">Recebidas</th>
+                                <th class="p-2.5 text-center">Executadas</th>
+                                <th class="p-2.5 text-center">Pendentes</th>
+                                <th class="p-2.5 text-center bg-sky-50 text-sky-600 font-extrabold rounded-tl-lg">IMPED. TEL</th>
+                                <th class="p-2.5 text-center bg-purple-50/70 text-purple-700">AGENDAMENTO</th>
+                                <th class="p-2.5 text-center bg-purple-50/70 text-purple-700">REDE / EXTERNA</th>
+                                <th class="p-2.5 text-center bg-purple-50/70 text-purple-700 rounded-tr-lg">SCRIPT / ILHA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-area" class="divide-y divide-slate-100"></tbody>
+                        <tfoot id="tfoot-area" class="border-t-2 border-slate-300 bg-slate-50/90 font-extrabold text-slate-800"></tfoot>
+                    </table>
+                </div>
             </div>
         </section>
 
-        <!-- 2. Gráfico Motivos de Reprogramação com comprimento reduzido (3 colunas = 25%) -->
-        <section class="lg:col-span-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">MOTIVOS DE REPROGRAMAÇÃO</h3>
-            <div class="h-64 flex items-center justify-center relative p-1">
-                <canvas id="chartReprogramacao"></canvas>
-            </div>
-        </section>
+        <!-- 2. Container dos Gráficos de Pizza/Rosca (35% da largura total) -->
+        <div class="w-full lg:w-[35%] flex flex-col sm:flex-row gap-3">
+            
+            <!-- Gráfico 1: Motivos de Reprogramação -->
+            <section class="w-full sm:w-1/2 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <h3 class="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">MOTIVOS DE REPROGRAMAÇÃO</h3>
+                <div class="h-64 flex items-center justify-center relative">
+                    <canvas id="chartReprogramacao"></canvas>
+                </div>
+            </section>
 
-        <!-- 3. Gráfico Situação da Atividade com comprimento reduzido (3 colunas = 25%) -->
-        <section class="lg:col-span-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
-            <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">SITUAÇÃO DA ATIVIDADE</h3>
-            <div class="h-64 flex items-center justify-center relative p-1">
-                <canvas id="chartSituacao"></canvas>
-            </div>
-        </section>
+            <!-- Gráfico 2: Situação da Atividade -->
+            <section class="w-full sm:w-1/2 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+                <h3 class="text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1">SITUAÇÃO DA ATIVIDADE</h3>
+                <div class="h-64 flex items-center justify-center relative">
+                    <canvas id="chartSituacao"></canvas>
+                </div>
+            </section>
+        </div>
+
     </div>
 
     <!-- TABELA DETALHADA -->
@@ -569,6 +584,7 @@
                 const ehPassivo = normalizarTexto(programadoVivoStr) === 'passivo';
                 const eProgramado = ehPassivo && temDataExec;
 
+                // Captura motivos de Reprogramação (Colunas AA, AB, AC, AD -> Índices 26, 27, 28, 29)
                 const motivosReprog = [];
                 [26, 27, 28, 29].forEach(idx => {
                     if (keys[idx] && item[keys[idx]]) {
@@ -687,6 +703,7 @@
             document.querySelectorAll('.chk-mes').forEach(c => c.checked = false);
             document.getElementById("label-meses-sel").innerText = "Todos os Meses";
 
+            if (document.getElementById('filtro-data')) document.getElementById('filtro-data').value = '';
             document.getElementById('filtro-passivo').value = '';
             document.getElementById('filtro-programado').value = '';
             document.getElementById('filtro-area').value = '';
@@ -701,6 +718,7 @@
         function aplicarFiltros() {
             const ano = document.getElementById('filtro-ano')?.value || '';
             const chksMeses = Array.from(document.querySelectorAll('.chk-mes:checked')).map(c => c.value);
+            const dataFiltro = document.getElementById('filtro-data')?.value || ''; // yyyy-mm-dd
 
             const passivo = document.getElementById('filtro-passivo')?.value || '';
             const programado = document.getElementById('filtro-programado')?.value || '';
@@ -712,6 +730,7 @@
             const filtrados = dadosGlobais.filter(d => {
                 const matchAno = !ano || d.ano === ano;
                 const matchMes = chksMeses.length === 0 || chksMeses.includes(d.mes);
+                const matchData = !dataFiltro || d.dataIso === dataFiltro;
                 const matchPassivo = !passivo || d.programadoVivo === passivo;
                 const matchProgramado = !programado || d.isProgramado === programado;
                 const matchArea = !area || d.area === area;
@@ -719,7 +738,7 @@
                 const matchSituacao = !situacao || d.situacao === situacao;
                 const matchRespPend = !respPend || d.resumoPendencias === respPend;
 
-                return matchAno && matchMes && matchPassivo && matchProgramado && matchArea && matchCoord && matchSituacao && matchRespPend;
+                return matchAno && matchMes && matchData && matchPassivo && matchProgramado && matchArea && matchCoord && matchSituacao && matchRespPend;
             });
 
             atualizarKPIsEFinanceiro(filtrados);
@@ -1024,10 +1043,19 @@
             });
         }
 
+        // CONSOLIDADO POR ÁREA COM LINHA DE TOTALIZAÇÃO NO TFOOT
         function atualizarTabelaAreaEChartSituacao(dados) {
             const porArea = {};
             const situacaoContagem = {};
             const reprogramacaoContagem = {};
+
+            let totRecebidas = 0;
+            let totExecutadas = 0;
+            let totPendentes = 0;
+            let totTel = 0;
+            let totVivoAgendamento = 0;
+            let totVivoRede = 0;
+            let totVivoScript = 0;
 
             dados.forEach(d => {
                 if (!porArea[d.area]) {
@@ -1042,6 +1070,7 @@
                     };
                 }
                 porArea[d.area].recebidas++;
+                totRecebidas++;
 
                 const sitNome = d.situacao || 'Não Informado';
                 situacaoContagem[sitNome] = (situacaoContagem[sitNome] || 0) + 1;
@@ -1051,20 +1080,29 @@
 
                 if (normSit === 'executada em campo') {
                     porArea[d.area].executadas++;
+                    totExecutadas++;
                 }
 
-                // Impedimento TEL
                 if (normResp === 'tel' && normSit !== 'executada em campo') {
                     porArea[d.area].tel++;
+                    totTel++;
                 }
 
                 if (normSit.includes('vivo') || normResp === 'vivo') {
-                    if (d.resumoPendencias.includes('Agendamento')) porArea[d.area].vivoAgendamento++;
-                    if (d.resumoPendencias.includes('Rede')) porArea[d.area].vivoRede++;
-                    if (d.resumoPendencias.includes('SCRIPT') || d.resumoPendencias.includes('Ilha')) porArea[d.area].vivoScript++;
+                    if (d.resumoPendencias.includes('Agendamento')) {
+                        porArea[d.area].vivoAgendamento++;
+                        totVivoAgendamento++;
+                    }
+                    if (d.resumoPendencias.includes('Rede')) {
+                        porArea[d.area].vivoRede++;
+                        totVivoRede++;
+                    }
+                    if (d.resumoPendencias.includes('SCRIPT') || d.resumoPendencias.includes('Ilha')) {
+                        porArea[d.area].vivoScript++;
+                        totVivoScript++;
+                    }
                 }
 
-                // Reprogramações (Colunas AA, AB, AC, AD)
                 if (d.motivosReprogramacao && d.motivosReprogramacao.length > 0) {
                     d.motivosReprogramacao.forEach(motivo => {
                         reprogramacaoContagem[motivo] = (reprogramacaoContagem[motivo] || 0) + 1;
@@ -1072,8 +1110,12 @@
                 }
             });
 
-            // Tabela Consolidada
+            totPendentes = totRecebidas - totExecutadas;
+
+            // 1. Tabela Consolidada (Linhas e Totalizador)
             const tbody = document.getElementById('tbody-area');
+            const tfoot = document.getElementById('tfoot-area');
+
             if (tbody) {
                 tbody.innerHTML = '';
                 Object.keys(porArea).forEach(area => {
@@ -1095,7 +1137,22 @@
                 });
             }
 
-            // Gráfico Pizza: Motivos de Reprogramação
+            if (tfoot) {
+                tfoot.innerHTML = `
+                    <tr>
+                        <td class="p-2.5 text-slate-900 text-left font-black tracking-wide">TOTAL</td>
+                        <td class="p-2.5 text-center text-slate-900 font-black">${totRecebidas}</td>
+                        <td class="p-2.5 text-center text-emerald-700 font-black">${totExecutadas}</td>
+                        <td class="p-2.5 text-center text-amber-700 font-black">${totPendentes}</td>
+                        <td class="p-2.5 text-center text-sky-700 font-black bg-sky-100/70">${totTel}</td>
+                        <td class="p-2.5 text-center text-purple-800 font-black bg-purple-100/60">${totVivoAgendamento}</td>
+                        <td class="p-2.5 text-center text-purple-800 font-black bg-purple-100/60">${totVivoRede}</td>
+                        <td class="p-2.5 text-center text-purple-800 font-black bg-purple-100/60">${totVivoScript}</td>
+                    </tr>
+                `;
+            }
+
+            // 2. Gráfico Pizza: Motivos de Reprogramação
             const canvasReprog = document.getElementById('chartReprogramacao');
             if (canvasReprog) {
                 const ctxReprog = canvasReprog.getContext('2d');
@@ -1124,7 +1181,7 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        layout: { padding: 25 },
+                        layout: { padding: 18 },
                         plugins: {
                             legend: { display: false },
                             datalabels: {
@@ -1134,7 +1191,7 @@
                                 textAlign: 'center',
                                 anchor: 'end',
                                 align: 'end',
-                                offset: 4,
+                                offset: 2,
                                 formatter: function(value, context) {
                                     if (!totalReprog) return '';
                                     const label = context.chart.data.labels[context.dataIndex];
@@ -1157,7 +1214,7 @@
                 });
             }
 
-            // Gráfico de Rosca: Situação da Atividade
+            // 3. Gráfico de Rosca: Situação da Atividade
             const canvasSituacao = document.getElementById('chartSituacao');
             if (canvasSituacao) {
                 const ctx = canvasSituacao.getContext('2d');
@@ -1188,7 +1245,7 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        layout: { padding: 25 },
+                        layout: { padding: 18 },
                         plugins: {
                             legend: { display: false },
                             datalabels: {
@@ -1197,7 +1254,7 @@
                                 textAlign: 'center',
                                 anchor: 'end',
                                 align: 'end',
-                                offset: 4,
+                                offset: 2,
                                 formatter: function(value, context) {
                                     const label = context.chart.data.labels[context.dataIndex];
                                     const pct = totalGeral > 0 ? ((value / totalGeral) * 100).toFixed(1) : '0';
