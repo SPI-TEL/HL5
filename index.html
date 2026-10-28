@@ -74,96 +74,96 @@
         </span>
     </div>
 
-    <!-- CARDS DE KPIS (6 COLUNAS) -->
+    <!-- CARDS DE KPIS COM ALTURA REDUZIDA (h-26) -->
     <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
         
         <!-- 1. Total Demandas -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32">
+        <div class="bg-white px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-26">
             <div class="flex justify-between items-center text-slate-400">
-                <span class="text-[10px] font-bold uppercase tracking-wider">Total Demandas</span>
-                <i class="fa-solid fa-circle-info text-xs text-slate-400"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider">Total Demandas</span>
+                <i class="fa-solid fa-circle-info text-[11px] text-slate-400"></i>
             </div>
-            <div class="flex items-baseline justify-between">
-                <p id="kpi-recebidas" class="text-3xl font-black text-slate-800">0</p>
-                <span class="text-[10px] bg-sky-50 text-sky-700 px-2 py-0.5 rounded-md font-bold">Baremo: R$ 166,72</span>
+            <div class="flex items-baseline justify-between my-0.5">
+                <p id="kpi-recebidas" class="text-2xl font-black text-slate-800">0</p>
+                <span class="text-[9px] bg-sky-50 text-sky-700 px-1.5 py-0.5 rounded font-bold">Baremo: R$ 166,72</span>
             </div>
-            <div class="border-t border-slate-100 pt-2 text-right">
-                <p id="fin-total-prisma" class="text-sm font-black text-slate-800">R$ 0,00</p>
+            <div class="border-t border-slate-100 pt-1 text-right">
+                <p id="fin-total-prisma" class="text-xs font-black text-slate-800">R$ 0,00</p>
             </div>
         </div>
 
         <!-- 2. Passivos -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-sky-500">
+        <div class="bg-white px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-26 border-l-4 border-l-sky-500">
             <div class="flex justify-between items-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-sky-600">Passivos</span>
-                <i class="fa-solid fa-boxes-packing text-xs text-sky-500"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider text-sky-600">Passivos</span>
+                <i class="fa-solid fa-boxes-packing text-[11px] text-sky-500"></i>
             </div>
-            <div class="flex items-baseline justify-between">
-                <p id="kpi-passivos" class="text-3xl font-black text-sky-600">0</p>
-                <span id="pct-passivos" class="text-[10px] bg-sky-50 text-sky-700 px-2 py-0.5 rounded-md font-bold">0% do total</span>
+            <div class="flex items-baseline justify-between my-0.5">
+                <p id="kpi-passivos" class="text-2xl font-black text-sky-600">0</p>
+                <span id="pct-passivos" class="text-[9px] bg-sky-50 text-sky-700 px-1.5 py-0.5 rounded font-bold">0% do total</span>
             </div>
-            <div class="border-t border-slate-100 pt-2 text-right">
-                <p id="fin-passivos-prisma" class="text-sm font-black text-sky-700">R$ 0,00</p>
+            <div class="border-t border-slate-100 pt-1 text-right">
+                <p id="fin-passivos-prisma" class="text-xs font-black text-sky-700">R$ 0,00</p>
             </div>
         </div>
 
         <!-- 3. Programados -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-indigo-500">
+        <div class="bg-white px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-26 border-l-4 border-l-indigo-500">
             <div class="flex justify-between items-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600">Programados</span>
-                <i class="fa-solid fa-calendar-check text-xs text-indigo-500"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider text-indigo-600">Programados</span>
+                <i class="fa-solid fa-calendar-check text-[11px] text-indigo-500"></i>
             </div>
-            <div class="flex items-baseline justify-between">
-                <p id="kpi-programados" class="text-3xl font-black text-indigo-600">0</p>
-                <span id="pct-programados" class="text-[10px] bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded-md font-bold">0% do total</span>
+            <div class="flex items-baseline justify-between my-0.5">
+                <p id="kpi-programados" class="text-2xl font-black text-indigo-600">0</p>
+                <span id="pct-programados" class="text-[9px] bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded font-bold">0% do total</span>
             </div>
-            <div class="border-t border-slate-100 pt-2 text-right">
-                <p id="fin-prog-prisma" class="text-sm font-black text-indigo-700">R$ 0,00</p>
+            <div class="border-t border-slate-100 pt-1 text-right">
+                <p id="fin-prog-prisma" class="text-xs font-black text-indigo-700">R$ 0,00</p>
             </div>
         </div>
 
         <!-- 4. Executadas -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-emerald-500">
+        <div class="bg-white px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-26 border-l-4 border-l-emerald-500">
             <div class="flex justify-between items-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
-                <i class="fa-solid fa-circle-check text-xs text-emerald-500"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-600">Executadas</span>
+                <i class="fa-solid fa-circle-check text-[11px] text-emerald-500"></i>
             </div>
-            <div class="flex items-baseline justify-between">
-                <p id="kpi-executadas" class="text-3xl font-black text-emerald-600">0</p>
-                <span id="pct-executadas" class="text-[10px] bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md font-bold">0% do total</span>
+            <div class="flex items-baseline justify-between my-0.5">
+                <p id="kpi-executadas" class="text-2xl font-black text-emerald-600">0</p>
+                <span id="pct-executadas" class="text-[9px] bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded font-bold">0% do total</span>
             </div>
-            <div class="border-t border-slate-100 pt-2 text-right">
-                <p id="fin-exec-prisma" class="text-sm font-black text-emerald-700">R$ 0,00</p>
+            <div class="border-t border-slate-100 pt-1 text-right">
+                <p id="fin-exec-prisma" class="text-xs font-black text-emerald-700">R$ 0,00</p>
             </div>
         </div>
 
         <!-- 5. Pendentes -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-amber-500">
+        <div class="bg-white px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-26 border-l-4 border-l-amber-500">
             <div class="flex justify-between items-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
-                <i class="fa-solid fa-hourglass-half text-xs text-amber-500"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider text-amber-600">Pendentes</span>
+                <i class="fa-solid fa-hourglass-half text-[11px] text-amber-500"></i>
             </div>
-            <div class="flex items-baseline justify-between">
-                <p id="kpi-pendentes" class="text-3xl font-black text-amber-600">0</p>
-                <span id="pct-pendentes" class="text-[10px] bg-amber-50 text-amber-700 px-2 py-0.5 rounded-md font-bold">0% do total</span>
+            <div class="flex items-baseline justify-between my-0.5">
+                <p id="kpi-pendentes" class="text-2xl font-black text-amber-600">0</p>
+                <span id="pct-pendentes" class="text-[9px] bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded font-bold">0% do total</span>
             </div>
-            <div class="border-t border-slate-100 pt-2 text-right">
-                <p id="fin-pend-prisma" class="text-sm font-black text-amber-700">R$ 0,00</p>
+            <div class="border-t border-slate-100 pt-1 text-right">
+                <p id="fin-pend-prisma" class="text-xs font-black text-amber-700">R$ 0,00</p>
             </div>
         </div>
 
         <!-- 6. Impedimento VIVO -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-32 border-l-4 border-l-purple-500">
+        <div class="bg-white px-3.5 py-2.5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between h-26 border-l-4 border-l-purple-500">
             <div class="flex justify-between items-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-purple-600">Imped. VIVO</span>
-                <i class="fa-solid fa-triangle-exclamation text-xs text-purple-500"></i>
+                <span class="text-[9px] font-bold uppercase tracking-wider text-purple-600">Imped. VIVO</span>
+                <i class="fa-solid fa-triangle-exclamation text-[11px] text-purple-500"></i>
             </div>
-            <div class="flex items-baseline justify-between">
-                <p id="kpi-vivo" class="text-3xl font-black text-purple-600">0</p>
-                <span id="pct-vivo" class="text-[10px] bg-purple-50 text-purple-700 px-2 py-0.5 rounded-md font-bold">0% do total</span>
+            <div class="flex items-baseline justify-between my-0.5">
+                <p id="kpi-vivo" class="text-2xl font-black text-purple-600">0</p>
+                <span id="pct-vivo" class="text-[9px] bg-purple-50 text-purple-700 px-1.5 py-0.5 rounded font-bold">0% do total</span>
             </div>
-            <div class="border-t border-slate-100 pt-2 text-right">
-                <p id="fin-vivo-prisma" class="text-sm font-black text-purple-700">R$ 0,00</p>
+            <div class="border-t border-slate-100 pt-1 text-right">
+                <p id="fin-vivo-prisma" class="text-xs font-black text-purple-700">R$ 0,00</p>
             </div>
         </div>
 
@@ -296,10 +296,10 @@
         </div>
     </div>
 
-    <!-- CONSOLIDADO POR ÁREA + GRÁFICO PIZZA REPROGRAMAÇÕES + SITUAÇÃO DA ATIVIDADE -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-        <!-- 1. Tabela Consolidada por Área com IMPED. TEL em azul -->
-        <section class="lg:col-span-2 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+    <!-- CONSOLIDADO POR ÁREA AMPLIADO (6/12) + GRÁFICOS REDUZIDOS (3/12 CADA) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <!-- 1. Tabela Consolidada com comprimento ampliado (ocupa 6 colunas = 50%) -->
+        <section class="lg:col-span-6 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">CONSOLIDADO POR ÁREA OPERACIONAL</h3>
             <div class="overflow-x-auto">
                 <table class="w-full text-xs text-left text-slate-600">
@@ -309,7 +309,6 @@
                             <th class="p-2.5 text-center">Recebidas</th>
                             <th class="p-2.5 text-center">Executadas</th>
                             <th class="p-2.5 text-center">Pendentes</th>
-                            <!-- Coluna alterada para Impedimento TEL com letras azuis -->
                             <th class="p-2.5 text-center bg-sky-50 text-sky-600 font-extrabold rounded-tl-lg">IMPED. TEL</th>
                             <th class="p-2.5 text-center bg-purple-50/70 text-purple-700">AGENDAMENTO</th>
                             <th class="p-2.5 text-center bg-purple-50/70 text-purple-700">REDE / EXTERNA</th>
@@ -321,18 +320,18 @@
             </div>
         </section>
 
-        <!-- 2. NOVO GRÁFICO PIZZA: MOTIVOS DE REPROGRAMAÇÃO (COLUNAS AA, AB, AC, AD) -->
-        <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <!-- 2. Gráfico Motivos de Reprogramação com comprimento reduzido (3 colunas = 25%) -->
+        <section class="lg:col-span-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">MOTIVOS DE REPROGRAMAÇÃO</h3>
-            <div class="h-64 flex items-center justify-center relative p-2">
+            <div class="h-64 flex items-center justify-center relative p-1">
                 <canvas id="chartReprogramacao"></canvas>
             </div>
         </section>
 
-        <!-- 3. Situação da Atividade -->
-        <section class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <!-- 3. Gráfico Situação da Atividade com comprimento reduzido (3 colunas = 25%) -->
+        <section class="lg:col-span-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <h3 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">SITUAÇÃO DA ATIVIDADE</h3>
-            <div class="h-64 flex items-center justify-center relative p-2">
+            <div class="h-64 flex items-center justify-center relative p-1">
                 <canvas id="chartSituacao"></canvas>
             </div>
         </section>
@@ -570,7 +569,6 @@
                 const ehPassivo = normalizarTexto(programadoVivoStr) === 'passivo';
                 const eProgramado = ehPassivo && temDataExec;
 
-                // Captura dos motivos de Reprogramações (Colunas AA, AB, AC, AD -> Índices 26, 27, 28, 29)
                 const motivosReprog = [];
                 [26, 27, 28, 29].forEach(idx => {
                     if (keys[idx] && item[keys[idx]]) {
@@ -1026,7 +1024,6 @@
             });
         }
 
-        // ATUALIZAÇÃO DO CONSOLIDADO POR ÁREA E DOS GRÁFICOS PIZZA
         function atualizarTabelaAreaEChartSituacao(dados) {
             const porArea = {};
             const situacaoContagem = {};
@@ -1056,7 +1053,7 @@
                     porArea[d.area].executadas++;
                 }
 
-                // Impedimento TEL (em substituição ao Impedimento Vivo na tabela)
+                // Impedimento TEL
                 if (normResp === 'tel' && normSit !== 'executada em campo') {
                     porArea[d.area].tel++;
                 }
@@ -1067,7 +1064,7 @@
                     if (d.resumoPendencias.includes('SCRIPT') || d.resumoPendencias.includes('Ilha')) porArea[d.area].vivoScript++;
                 }
 
-                // Acumula motivos das Colunas AA, AB, AC, AD
+                // Reprogramações (Colunas AA, AB, AC, AD)
                 if (d.motivosReprogramacao && d.motivosReprogramacao.length > 0) {
                     d.motivosReprogramacao.forEach(motivo => {
                         reprogramacaoContagem[motivo] = (reprogramacaoContagem[motivo] || 0) + 1;
@@ -1075,7 +1072,7 @@
                 }
             });
 
-            // 1. Tabela Consolidada com IMPED. TEL em azul
+            // Tabela Consolidada
             const tbody = document.getElementById('tbody-area');
             if (tbody) {
                 tbody.innerHTML = '';
@@ -1098,7 +1095,7 @@
                 });
             }
 
-            // 2. Gráfico Pizza: Motivos de Reprogramação (Colunas AA, AB, AC, AD)
+            // Gráfico Pizza: Motivos de Reprogramação
             const canvasReprog = document.getElementById('chartReprogramacao');
             if (canvasReprog) {
                 const ctxReprog = canvasReprog.getContext('2d');
@@ -1127,7 +1124,7 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        layout: { padding: 30 },
+                        layout: { padding: 25 },
                         plugins: {
                             legend: { display: false },
                             datalabels: {
@@ -1137,7 +1134,7 @@
                                 textAlign: 'center',
                                 anchor: 'end',
                                 align: 'end',
-                                offset: 6,
+                                offset: 4,
                                 formatter: function(value, context) {
                                     if (!totalReprog) return '';
                                     const label = context.chart.data.labels[context.dataIndex];
@@ -1160,7 +1157,7 @@
                 });
             }
 
-            // 3. Gráfico de Rosca: Situação da Atividade
+            // Gráfico de Rosca: Situação da Atividade
             const canvasSituacao = document.getElementById('chartSituacao');
             if (canvasSituacao) {
                 const ctx = canvasSituacao.getContext('2d');
@@ -1191,16 +1188,16 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        layout: { padding: 30 },
+                        layout: { padding: 25 },
                         plugins: {
                             legend: { display: false },
                             datalabels: {
                                 color: '#475569',
-                                font: { size: 10, weight: 'bold', family: 'Inter, sans-serif' },
+                                font: { size: 9, weight: 'bold', family: 'Inter, sans-serif' },
                                 textAlign: 'center',
                                 anchor: 'end',
                                 align: 'end',
-                                offset: 8,
+                                offset: 4,
                                 formatter: function(value, context) {
                                     const label = context.chart.data.labels[context.dataIndex];
                                     const pct = totalGeral > 0 ? ((value / totalGeral) * 100).toFixed(1) : '0';
